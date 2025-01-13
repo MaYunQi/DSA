@@ -11,7 +11,6 @@ namespace DSA.StackAndQueue.Queue
         public QueueWithList()
         {
             list = new MyLinkedList<T>();
-
         }
         public void Clear()
         {
