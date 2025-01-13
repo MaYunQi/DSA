@@ -6,6 +6,11 @@ namespace DSA.List
         public ListNode<T>? Head { get; set; }
         public uint Length { get; private set; }
         public LinkedList() { }
+        public LinkedList(T value)
+        {
+            Head=new ListNode<T>(value);
+            Length=1;
+        }
         public LinkedList(ListNode<T> head)
         {
             Head = head;
@@ -48,6 +53,24 @@ namespace DSA.List
         public ListNode<T> GetLast()
         {
             return GetRearNode();
+        }
+        /// <summary>
+        /// Return the middle node of the list
+        /// </summary>
+        /// <returns>Middle Node</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public ListNode<T> GetMiddleNode()
+        {
+            if (Head == null)
+                throw new InvalidOperationException("The list is empty.");
+            ListNode<T> fast = Head;
+            ListNode<T> slow = Head;
+            while(fast.Next!=null)
+            {
+                fast = fast.Next.Next;
+                slow = slow.Next;
+            }
+            return slow; 
         }
         /// <summary>
         /// Get Kth node from the list.
@@ -386,10 +409,9 @@ namespace DSA.List
                 throw new InvalidOperationException("The list is empty.");
             ListNode<T> previous = null;
             ListNode<T> current = Head;
-            ListNode<T> next = null;
             while(current!=null)
             {
-                next = current.Next;
+                ListNode<T> next = current.Next;
                 current.Next = previous;
                 previous = current;
                 current = next;
@@ -409,6 +431,42 @@ namespace DSA.List
             node.Next.Next = node;
             node.Next = null;
             return reversed;
+        }
+        /// <summary>
+        /// Return true if the list is a cycle,
+        /// </summary>
+        /// <returns>True or false</returns>
+        public bool IsCycle()
+        {
+            if(Head==null||Head.Next==null)
+                return false;
+            ListNode<T> fast = Head;
+            ListNode<T> slow = Head;
+            while(fast!=null&&fast.Next!=null)
+            {
+                slow = slow.Next;
+                fast=fast.Next.Next;
+                if(slow==fast)
+                    return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Return whether the list is sorted with ascending order.
+        /// </summary>
+        /// <returns>True or False</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public bool IsSorted()
+        {
+            if(Head==null)
+                throw new InvalidOperationException("The list is empty.");
+            ListNode<T> current = Head;
+            while(current.Next!=null)
+            {
+                if(current>current.Next)
+                    return false;
+            }
+            return true;
         }
         /// <summary>
         /// Return true if the list is empty.
