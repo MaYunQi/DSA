@@ -1,21 +1,21 @@
 ﻿
 namespace DSA.List
 {
-    public class ArrayList<T> where T : IComparable<T>,IEquatable<T>
+    public class MyArrayList<T> where T : IComparable<T>,IEquatable<T>
     {
         private T[] array;
         public uint Capacity { get; private set; } = 20;
         public uint Count { get; private set; }
-        public ArrayList()
+        public MyArrayList()
         {
             array = new T[Capacity];
         }
-        public ArrayList(uint capacity)
+        public MyArrayList(uint capacity)
         {
             array=new T[capacity];
             Capacity = capacity;
         }
-        public ArrayList(T value,uint capacity) :this(capacity)
+        public MyArrayList(T value,uint capacity) :this(capacity)
         {
             array[0] = value;
             Count++;
@@ -135,6 +135,8 @@ namespace DSA.List
                     }
                     array[Count - 1] = default;
                     Count--;
+                    if (Count < Capacity / 3)
+                        ShrinkArray();
                     return;
                 }
             }
@@ -158,6 +160,8 @@ namespace DSA.List
                 array[i]=default;
             }
             Count-= shift;
+            if (Count < Capacity / 3)
+                ShrinkArray();
         }
         /// <summary>
         /// Delete the item at the index.
@@ -174,6 +178,8 @@ namespace DSA.List
             }
             array[Count - 1] = default;
             Count--;
+            if (Count < Capacity / 3)
+                ShrinkArray();
         }
         /// <summary>
         /// Return true if the array is empty.
@@ -225,6 +231,19 @@ namespace DSA.List
             Capacity = Capacity * 2;
             T[] newArray = new T[Capacity];
             for(int i=0;i<Count;i++)
+            {
+                newArray[i] = array[i];
+            }
+            array = newArray;
+        }
+        /// <summary>
+        /// Shrink the array
+        /// </summary>
+        private void ShrinkArray()
+        {
+            Capacity = Capacity/2;
+            T[] newArray = new T[Capacity];
+            for (int i = 0; i < Count; i++)
             {
                 newArray[i] = array[i];
             }

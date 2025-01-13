@@ -1,17 +1,17 @@
 ﻿
 namespace DSA.List
 {
-    public class LinkedList<T> where T : IComparable<T>, IEquatable<T>
+    public class MyLinkedList<T> where T : IComparable<T>, IEquatable<T>
     {
         public ListNode<T>? Head { get; set; }
         public uint Length { get; private set; }
-        public LinkedList() { }
-        public LinkedList(T value)
+        public MyLinkedList() { }
+        public MyLinkedList(T value)
         {
             Head=new ListNode<T>(value);
             Length=1;
         }
-        public LinkedList(ListNode<T> head)
+        public MyLinkedList(ListNode<T> head)
         {
             Head = head;
             Length = 1 ;
@@ -294,12 +294,26 @@ namespace DSA.List
             }
             Length++;
         }
+        public void AddFirst(T value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value)+"is null");
+            ListNode<T> node = new ListNode<T>(value);
+            AddFirst(node);
+        }
         /// <summary>
         /// Add a node in the rear.
         /// </summary>
         /// <param name="node">Node</param>
         public void AddLast(ListNode<T> node)
         {
+            Append(node);
+        }
+        public void AddLast(T value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value) + "is null");
+            ListNode<T> node = new ListNode<T>(value);
             Append(node);
         }
         /// <summary>
@@ -366,6 +380,34 @@ namespace DSA.List
                 return;
             previous.Next = previous.Next.Next;
             Length--;
+        }
+        /// <summary>
+        /// Delete all node with the input value.
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void DeleteAllNodeWithValue(T value)
+        {
+            if (Head == null)
+                throw new InvalidOperationException("The list is empty.");
+            while(Head!=null&&Head.Value.Equals(value))
+            {
+                Head = Head.Next;
+                Length--;
+            }
+            if(Head==null)
+                return;
+            ListNode<T> current = Head;
+            while(current.Next!=null)
+            {
+                if(current.Next.Value.Equals(value))
+                {
+                    current.Next = current.Next.Next;
+                    Length--;
+                }
+                else
+                    current = current.Next;
+            }
         }
         /// <summary>
         /// Delete a node at the kth index.
