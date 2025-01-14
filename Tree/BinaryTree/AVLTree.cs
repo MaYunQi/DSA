@@ -1,5 +1,4 @@
 ﻿using DSA.Tree.Interfaces;
-using System.Collections.Generic;
 
 namespace DSA.Tree.BinaryTree
 {
