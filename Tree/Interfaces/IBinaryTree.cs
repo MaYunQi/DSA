@@ -3,9 +3,10 @@ namespace DSA.Tree.Interfaces
 {
     public interface IBinaryTree<T> where T : IComparable<T>, IEquatable<T>
     {
-        void Add(T value);
-        void Remove(T value);
+        bool Add(T value);
+        bool Remove(T value);
         void Clear();
+        void ReverseTree();
         TreeNode<T> GetNode(T value);
         TreeNode<T> GetMinNode();
         TreeNode<T> GetMaxNode();
@@ -22,5 +23,8 @@ namespace DSA.Tree.Interfaces
         bool IsLeafValue(T value);
         bool IsEmpty();
         uint GetTreeHeight();
+        int GetNodeDepth(TreeNode<T> node);
+        int GetNodeHeight(TreeNode<T> node);
+        void InOrderTraversal();
     }
 }

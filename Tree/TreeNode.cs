@@ -9,14 +9,14 @@ namespace DSA.Tree
         public TreeNode()
         {
             Value = default;
-            Left = new TreeNode<T>();
-            Right = new TreeNode<T>();
+            Left = null;
+            Right = null;
         }
         public TreeNode(T value)
         {
             Value= value;
-            Left = new TreeNode<T>();
-            Right = new TreeNode<T>();
+            Left = null;
+            Right = null;
         }
         public static bool operator <(TreeNode<T> left, TreeNode<T> right)
         {
@@ -28,6 +28,10 @@ namespace DSA.Tree
         }
         public static bool operator ==(TreeNode<T> left, TreeNode<T> right)
         {
+            if (left is null && right is null)
+                return true;
+            if(left is null || right is null)
+                return false;
             return left.Value.Equals(right.Value);
         }
         public static bool operator !=(TreeNode<T> left, TreeNode<T> right)

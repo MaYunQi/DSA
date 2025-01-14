@@ -21,22 +21,24 @@ namespace DSA.Tree.BinaryTree
             Root = new TreeNode<T>(value);
             Count = 1;
         }
-        public void Add(T value)
+        public virtual bool Add(T value)
         {
-            TreeNode<T> node = new TreeNode<T>(value);
+            TreeNode<T> node = new(value);
             if(Count==0)
                 Root = node;
             else
             {
                 TreeNode<T> current= Root;
                 TreeNode<T> parent = null;
-                while(current!=null)
+                while (current != null)
                 {
                     if (current == node)
-                        return;
+                        return false;
                     parent = current;
                     if (node > current)
+                    {
                         current = current.Right;
+                    }
                     else
                         current = current.Left;
                 }
@@ -46,46 +48,102 @@ namespace DSA.Tree.BinaryTree
                     parent.Left = node;
             }
             Count++;
+            return true;
         }
-        public void AddRecursively(T value)
+        public virtual bool AddRecursively(T value)
         {
-            AddRecursively(Root, value);
-            Count++;
+            bool isAdded=false;
+            AddRecursively(Root, value,ref isAdded);
+            if(isAdded)
+                Count++;
+            return isAdded;
         }
-        private TreeNode<T> AddRecursively(TreeNode<T> root, T value)
+        private TreeNode<T> AddRecursively(TreeNode<T> root, T value,ref bool isAdded)
         {
-            TreeNode<T> node= new TreeNode<T> (value);
+            TreeNode<T> node= new(value);
             if(root==null)
             {
                 root = node;
+                isAdded = true;
                 return root;
             }
             if(node==root)
+            {
+                isAdded = false;
                 return root;
+            } 
             else if (node > root)
-                root.Right = AddRecursively(root.Right, value);
+                root.Right = AddRecursively(root.Right, value,ref isAdded);
             else
-                root.Left = AddRecursively(root.Left, value);
+                root.Left = AddRecursively(root.Left, value,ref isAdded);
             return root;
         }
-        public void Remove(T value)
+        public virtual bool Remove(T value)
         {
-            throw new NotImplementedException();
-        }
-        public void RemoveRecursively(T value)
-        {
-            RemoveRecursively(Root, value);
-        }
-        private TreeNode<T> RemoveRecursively(TreeNode<T> root,T value)
-        {
-            if (root == null)
-                return null;
-            if (root.Value.CompareTo(value) < 0)
-                root.Right = RemoveRecursively(root.Right, value);
-            else if(root.Value.CompareTo(value) >0)
-                root.Left= RemoveRecursively(root.Left, value);
+            if (Root == null)
+                return false;
+            TreeNode<T> current=Root;
+            TreeNode<T>parent = null;
+            while(current!=null&&!current.Value.Equals(value))
+            {
+                parent = current;
+                if (current.Value.CompareTo(value) > 0)
+                    current = current.Left;
+                else if(current.Value.CompareTo(value)<0)
+                    current = current.Right;
+            }
+            if (current == null)
+                return false;
+            if(current.Left==null||current.Right==null)
+            {
+                TreeNode<T> child= current.Left??current.Right;
+                if(parent==null)
+                    Root=child;
+                else if(parent.Left==current)
+                    parent.Left=child;
+                else
+                    parent.Right=child;
+            }
             else
             {
+                TreeNode<T> successorParent = current;
+                TreeNode<T> successor=current.Right;
+                while(successor.Left!=null)
+                {
+                    successorParent = successor;
+                    successor = successor.Left;
+                }
+                current.Value=successor.Value;
+                if (successorParent.Left == successor)
+                    successorParent.Left = successor.Right;
+                else
+                    successorParent.Right=successor.Right;
+            }
+            Count--;
+            return true;
+        }
+        public virtual bool RemoveRecursively(T value)
+        {
+            bool isRemoved=false;
+            RemoveRecursively(Root, value,ref isRemoved);
+            if (isRemoved)
+                Count--;
+            return isRemoved;
+        }
+        private TreeNode<T> RemoveRecursively(TreeNode<T> root,T value,ref bool isRemoved)
+        {
+            if (root == null)
+            {
+                isRemoved = false;
+                return null;
+            }
+            if (root.Value.CompareTo(value) < 0)
+                root.Right = RemoveRecursively(root.Right, value, ref isRemoved);
+            else if(root.Value.CompareTo(value) >0)
+                root.Left= RemoveRecursively(root.Left, value, ref isRemoved);
+            else
+            {
+                isRemoved = true;
                 if (root.Left == null && root.Right == null)
                     return null;
                 else if (root.Left == null)
@@ -96,7 +154,7 @@ namespace DSA.Tree.BinaryTree
                 {
                     TreeNode<T> minNode=GetMinNode(root.Right);
                     root.Value=minNode.Value;
-                    root.Right=RemoveRecursively(root.Right, minNode.Value);
+                    root.Right=RemoveRecursively(root.Right, minNode.Value,ref isRemoved);
                 }
             }
             return root;
@@ -179,7 +237,7 @@ namespace DSA.Tree.BinaryTree
         }
         public List<TreeNode<T>> GetAllNodes()
         {
-            List<TreeNode<T>> result= new List<TreeNode<T>>();
+            List<TreeNode<T>> result= new();
             if (Root == null)
                 return null;
             Stack<TreeNode<T>> stack=new Stack<TreeNode<T>>();
@@ -254,7 +312,7 @@ namespace DSA.Tree.BinaryTree
                 return null;
             List<TreeNode<T>> result = new List<TreeNode<T>>();
             TreeNode<T> current=Root;
-            Stack<TreeNode<T>> stack = new Stack<TreeNode<T>>();
+            Stack<TreeNode<T>> stack = new();
             stack.Push(current);
             while(stack.Count>0)
             {
@@ -457,7 +515,7 @@ namespace DSA.Tree.BinaryTree
         }
         public List<T> GetRightViewNodesValueRecursively()
         {
-            List<T> list = new List<T>();
+            List<T> list = new();
             GetRightViewNodesValueRecursively(Root, 0, list);
             return list;
         }
@@ -580,6 +638,117 @@ namespace DSA.Tree.BinaryTree
             heightLeft = GetTreeHeightRecursively(root.Left);
             heightRight =  GetTreeHeightRecursively(root.Right);
             return 1+Math.Max(heightLeft,heightRight);
+        }
+        public void ReverseTree()
+        {
+            if (Root == null)
+                return;
+            Queue<TreeNode<T>> que= new Queue<TreeNode<T>>();
+            que.Enqueue(Root);
+            while(que.Count>0)
+            {
+                TreeNode<T> current=que.Dequeue();
+                TreeNode<T> temp = current.Left;
+                current.Left=current.Right;
+                current.Right=temp;
+                if(current.Left!=null)
+                    que.Enqueue(current.Left);
+                if(current.Right!=null)
+                    que.Enqueue(current.Right);
+            }
+        }
+        public void ReverseTreeRecursively()
+        {
+            ReverseTreeRecursively(Root);
+        }
+        public void ReverseTreeRecursively(TreeNode<T> root)
+        {
+            if (root == null)
+                return;
+            TreeNode<T> Temp = root.Left;
+            root.Left = root.Right;
+            root.Right = Temp;
+            ReverseTreeRecursively(root.Left);
+            ReverseTreeRecursively(root.Right);
+        }
+        public int GetNodeDepth(TreeNode<T> node)
+        {
+            if(Root==null)
+                throw new NullReferenceException("The tree is null");
+            int depth = 0;
+            TreeNode<T> current = Root;
+            while(current != null)
+            {
+                if(current == node)
+                    return depth;
+                if(current < node)
+                    current=current.Right;
+                if(current>node)
+                    current=current.Left;
+                depth++;
+            }
+            return -1;
+        }
+        public int GetNodeDepthRecursively(TreeNode<T> node)
+        {
+            if (Root == null)
+                throw new NullReferenceException("The tree is null.");
+            if (node == null)
+                throw new ArgumentNullException(nameof(node)+"is null.");
+            return GetNodeDepthRecursively(Root,node,0);
+        }
+        private int GetNodeDepthRecursively(TreeNode<T> root, TreeNode<T> node,int depth)
+        {
+            if (node == null)
+                return -1;
+            if(node==root)
+                return depth;
+            if (node > root)
+                return GetNodeDepthRecursively(root.Right,node,depth+1);
+            else
+                return GetNodeDepthRecursively(root.Left,node,depth+1);
+        }
+        public int GetNodeHeight(TreeNode<T> node)
+        {
+            if (node == null)
+                return -1;
+            Queue<TreeNode<T>> queue= new Queue<TreeNode<T>>();
+            queue.Enqueue(node);
+            int height = -1;
+            while (queue.Count > 0)
+            {
+                int leveNodeCount= queue.Count;
+                height++;
+                for(int i=0;i<leveNodeCount;i++)
+                {
+                    TreeNode<T> current= queue.Dequeue();
+                    if(current.Left!=null)
+                        queue.Enqueue(current.Left);
+                    if(current.Right!=null)
+                        queue.Enqueue(current.Right);
+                }
+            }
+            return height;
+        }
+        public int GetNodeHeightRecursively(TreeNode<T> node)
+        {
+            if (node == null)
+                return -1;
+            int leftHeight=GetNodeHeightRecursively(node.Left);
+            int rightHeight=GetNodeHeightRecursively(node.Right);
+            return Math.Max(leftHeight, rightHeight)+1;
+        }
+        public void InOrderTraversal()
+        {
+            InOrderTraversal(Root);
+        }
+        private void InOrderTraversal(TreeNode<T> node)
+        {
+            if(node==null)
+                return;
+            InOrderTraversal(node.Left);
+            Console.WriteLine(node.Value);
+            InOrderTraversal(node.Right);
         }
     }
 }
