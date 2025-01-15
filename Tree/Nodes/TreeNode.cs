@@ -1,9 +1,7 @@
-﻿
-namespace DSA.Tree
+﻿namespace DSA.Tree.Nodes
 {
-    public class TreeNode<T> where T:IComparable<T>,IEquatable<T>
+    public class TreeNode<T>: Node<T> where T : IComparable<T>, IEquatable<T>
     {
-        public T? Value { get; set; }
         public TreeNode<T>? Left { get; set; }
         public TreeNode<T>? Right { get; set; }
         public TreeNode()
@@ -14,7 +12,7 @@ namespace DSA.Tree
         }
         public TreeNode(T value)
         {
-            Value= value;
+            Value = value;
             Left = null;
             Right = null;
         }
@@ -28,15 +26,17 @@ namespace DSA.Tree
         }
         public static bool operator ==(TreeNode<T> left, TreeNode<T> right)
         {
+            if(ReferenceEquals(left,right))
+                return true;
             if (left is null && right is null)
                 return true;
-            if(left is null || right is null)
+            if (left is null || right is null)
                 return false;
             return left.Value.Equals(right.Value);
         }
         public static bool operator !=(TreeNode<T> left, TreeNode<T> right)
         {
-            return !(left==right);
+            return !(left == right);
         }
     }
 }

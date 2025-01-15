@@ -35,6 +35,8 @@ namespace DSA.List
         {
             if(ReferenceEquals(left,right))
                 return true;
+            if(left is null && right is null)
+                return true;
             if(left is null || right is null)
                 return false;
             return left.Value.Equals(right.Value);

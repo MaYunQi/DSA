@@ -1,19 +1,21 @@
 ﻿using DSA.Tree.Interfaces;
+using DSA.Tree.Nodes;
 
 namespace DSA.Tree.BinaryTree
 {
     public class AVLTree<T> : BinarySearchTree<T>, IBinaryTree<T> where T : IComparable<T>, IEquatable<T>
     {
-        public override bool Add(T value)
+        public TreeNode<T> Root { get; private set; }
+        public override bool Insert(T value)
         {
-            bool result = base.Add(value);
+            bool result = base.Insert(value);
             if (result)
                 BalanceTree();
             return result;
         }
-        public override bool AddRecursively(T value)
+        public override bool InsertRecursively(T value)
         {
-            bool result = base.AddRecursively(value);
+            bool result = base.InsertRecursively(value);
             if (result)
                 BalanceTree();
             return result;

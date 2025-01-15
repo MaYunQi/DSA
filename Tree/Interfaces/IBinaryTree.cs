@@ -1,9 +1,10 @@
-﻿
+﻿using DSA.Tree.Nodes;
+
 namespace DSA.Tree.Interfaces
 {
     public interface IBinaryTree<T> where T : IComparable<T>, IEquatable<T>
     {
-        bool Add(T value);
+        bool Insert(T value);
         bool Remove(T value);
         void Clear();
         void ReverseTree();

@@ -1,10 +1,11 @@
 ﻿using DSA.Tree.Interfaces;
+using DSA.Tree.Nodes;
 
 namespace DSA.Tree.BinaryTree
 {
     public class BinarySearchTree<T>:IBinaryTree<T> where T : IComparable<T>, IEquatable<T>
     {
-        public TreeNode<T>? Root { get; set; }
+        public TreeNode<T>? Root { get; private set; }
         public uint Count { get; private set; }
         public BinarySearchTree()
         {
@@ -21,7 +22,7 @@ namespace DSA.Tree.BinaryTree
             Root = new TreeNode<T>(value);
             Count = 1;
         }
-        public virtual bool Add(T value)
+        public virtual bool Insert(T value)
         {
             TreeNode<T> node = new(value);
             if(Count==0)
@@ -50,32 +51,32 @@ namespace DSA.Tree.BinaryTree
             Count++;
             return true;
         }
-        public virtual bool AddRecursively(T value)
+        public virtual bool InsertRecursively(T value)
         {
-            bool isAdded=false;
-            AddRecursively(Root, value,ref isAdded);
-            if(isAdded)
+            bool isInserted=false;
+            InsertRecursively(Root, value,ref isInserted);
+            if(isInserted)
                 Count++;
-            return isAdded;
+            return isInserted;
         }
-        private TreeNode<T> AddRecursively(TreeNode<T> root, T value,ref bool isAdded)
+        private TreeNode<T> InsertRecursively(TreeNode<T> root, T value,ref bool isInserted)
         {
             TreeNode<T> node= new(value);
             if(root==null)
             {
                 root = node;
-                isAdded = true;
+                isInserted = true;
                 return root;
             }
             if(node==root)
             {
-                isAdded = false;
+                isInserted = false;
                 return root;
             } 
             else if (node > root)
-                root.Right = AddRecursively(root.Right, value,ref isAdded);
+                root.Right = InsertRecursively(root.Right, value,ref isInserted);
             else
-                root.Left = AddRecursively(root.Left, value,ref isAdded);
+                root.Left = InsertRecursively(root.Left, value,ref isInserted);
             return root;
         }
         public virtual bool Remove(T value)
@@ -92,32 +93,33 @@ namespace DSA.Tree.BinaryTree
                 else if(current.Value.CompareTo(value)<0)
                     current = current.Right;
             }
-            if (current == null)
+            if (current == null) // If value not found, return
                 return false;
-            if(current.Left==null||current.Right==null)
+            if(current.Left==null||current.Right==null) // Current node only has one child.
             {
-                TreeNode<T> child= current.Left??current.Right;
-                if(parent==null)
-                    Root=child;
-                else if(parent.Left==current)
+                TreeNode<T> child= current.Left??current.Right; //Get the only child of node need to be deleted.
+                if(parent==null) 
+                    Root=child; //Current node is root node, delete the root node. Set the child to root.
+                else if(parent.Left==current) //Delete the current node by point the parent node to the child.
                     parent.Left=child;
                 else
                     parent.Right=child;
             }
-            else
+            else //Node has two child.
             {
-                TreeNode<T> successorParent = current;
+                TreeNode<T> successorParent = current; 
                 TreeNode<T> successor=current.Right;
                 while(successor.Left!=null)
                 {
-                    successorParent = successor;
-                    successor = successor.Left;
+                    successorParent = successor;// Parent node of the minimal node.
+                    successor = successor.Left; // Get the node with the minimal value after the node need to be deleted.
                 }
-                current.Value=successor.Value;
-                if (successorParent.Left == successor)
-                    successorParent.Left = successor.Right;
-                else
-                    successorParent.Right=successor.Right;
+                current.Value=successor.Value; //Set the value of current node to the minimal value.
+                if (successorParent.Left == successor) // If the minimal node is in the left side of parent
+                    successorParent.Left = successor.Right; // Set the the next minimal node or null to the parent's left.
+                else // If the minimal node is in the left side of parent
+                    successorParent.Right=successor.Right; //// Set the the next minimal node or null to the parent's right.
+                // Then the minimal node disconnected from the tree. 
             }
             Count--;
             return true;

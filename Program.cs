@@ -13,7 +13,7 @@ namespace DSA
             {
                 Random random = new Random();
                 int a=random.Next(0,100);
-                tree.Add(i);    
+                tree.Insert(a);    
             }
             tree.InOrderTraversal();
         }
