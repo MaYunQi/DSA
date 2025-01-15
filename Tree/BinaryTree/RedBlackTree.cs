@@ -136,6 +136,7 @@ namespace DSA.Tree.BinaryTree
                 {
                     RedBlackNode<T> parent = DeleteLeafNode(node);
                     //Fix Deletion
+                    FixDeletion(parent);
                 }
             }
             // Node has two childs.
@@ -204,6 +205,79 @@ namespace DSA.Tree.BinaryTree
             Count--;
             return true;
         }
+        private void FixDeletion(RedBlackNode<T> node)
+        {
+            RedBlackNode<T> sibling= (node.Left != Nil) ? node.Left : node.Right;
+            Color siblingColor=sibling.Color;
+            if(siblingColor==Color.Black)
+            {
+                //Case 1: Sibing has at least one red node.
+                if (sibling.Left!=Nil||sibling.Right!=Nil)
+                {
+                    if (sibling.Left.Color == Color.Red || sibling.Right.Color == Color.Red)
+                    {
+                        //LL Rotation
+                        if (sibling.Left.Color == Color.Red && sibling == node.Left)
+                        {
+                            sibling.Left.Color = sibling.Color;
+                            sibling.Color = node.Color;
+                            node.Color = Color.Black;
+                            RightRotation(node);
+                        }
+                        //RR Rotation
+                        if (sibling.Right.Color == Color.Red && sibling == node.Right)
+                        {
+                            sibling.Right.Color = sibling.Color;
+                            sibling.Color = node.Color;
+                            node.Color = Color.Black;
+                            LeftRotation(node);
+                        }
+                        //LR
+                        if (sibling.Left.Color != Color.Red && sibling.Right.Color == Color.Red && sibling == node.Left)
+                        {
+                            sibling.Right.Color = node.Color;
+                            node.Color = Color.Black;
+                            LeftRotation(sibling);
+                            RightRotation(node);
+                        }
+                        //RL
+                        if (sibling == node.Right && sibling.Right.Color != Color.Red && sibling.Left.Color == Color.Red)
+                        {
+                            sibling.Left.Color = node.Color;
+                            node.Color = Color.Black;
+                            RightRotation(sibling);
+                            LeftRotation(node);
+                        }
+                    }
+                
+                }
+                //Case 2: Sibling has no red child
+                if(sibling.Left.Color==Color.Black&&sibling.Right.Color==Color.Black)
+                {
+                    sibling.Color = Color.Red;
+                    RedBlackNode<T> siblingOfDoubleBlack = GetSiblingNode(node);
+                    if(siblingOfDoubleBlack.Color==Color.Black)
+                    {
+                        if(siblingOfDoubleBlack==node.Right&&siblingOfDoubleBlack.Right.Color==Color.Red)
+                        {
+                            siblingOfDoubleBlack.Right.Color = siblingOfDoubleBlack.Color;
+                            siblingOfDoubleBlack.Color=node.Color;
+                            node.Color=Color.Black;
+                            LeftRotation(node);
+                        }
+                    }
+                }
+            }
+        }
+        private RedBlackNode<T> GetSiblingNode(RedBlackNode<T> node)
+        {
+            RedBlackNode<T> sibling;
+            if(node==node.Parent.Left)
+                sibling = node.Right;
+            else
+                sibling = node.Left;
+            return sibling;
+        }
         private RedBlackNode<T> DeleteLeafNode(RedBlackNode<T> node)
         {
             RedBlackNode <T> parent=node.Parent;
@@ -224,10 +298,6 @@ namespace DSA.Tree.BinaryTree
                 node.Parent.Right = child;
             node = null;
             return child;
-        }
-        private void FixDeletion()
-        {
-
         }
         private void LeftRotation(RedBlackNode<T> node)
         {
