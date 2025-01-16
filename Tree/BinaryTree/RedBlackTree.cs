@@ -120,184 +120,133 @@ namespace DSA.Tree.BinaryTree
         {
             if(Root==null||Root==Nil)
                 return true;
-            RedBlackNode<T> node = GetNode(value);
-            if (node == null)
+            RedBlackNode<T> nodeToDelete = GetNode(value);
+            if (nodeToDelete == null|| nodeToDelete == Nil)
                 return true;
-            //Leaf node
-            if(node.Left==Nil&&node.Right==Nil)
-            {
-                //Case 1: Red leaf node, just delete.
-                if(node.Color==Color.Red)
-                {
-                    RedBlackNode<T> parent=DeleteLeafNode(node);
-                }
-                //Case 2: Black leaf node, need to adjust the tree. Double Black
-                else 
-                {
-                    RedBlackNode<T> parent = DeleteLeafNode(node);
-                    //Fix Deletion
-                    FixDeletion(parent);
-                }
-            }
-            // Node has two childs.
-            else if(node.Left != Nil && node.Right != Nil)
-            {
-                RedBlackNode<T> minNode = GetMinNode(node.Right);
-                Color originalColor = minNode.Color;
-                RedBlackNode<T> minRightChild=minNode.Right;
-                if (node.Parent == null) //If node is Root node
-                {
-                    Root = minNode;//Set the minNode to be the Root ndoe.
-                    minNode.Left = node.Left;
-                    if(node.Left!=Nil)
-                        node.Left.Parent = minNode;
-                    minNode.Parent = null;
-                }
-                else if (minNode.Parent == node) //If the minNode is the right child of node.
-                {
-                    minNode.Parent = node.Parent;
-                    if (node == node.Parent.Left)
-                        node.Parent.Left = minNode;
-                    else
-                        node.Parent.Right= minNode; //Attach the minNode to the parent node of The node.
-                }
-                else
-                {
-                    minNode.Parent = node.Parent;
-                    if (node == node.Parent.Left)
-                        node.Parent.Left = minNode;
-                    else
-                        node.Parent.Right = minNode;
-                    minNode.Right = node.Right;
-                    node.Right.Parent = minNode;
-                }
-                if (node.Right != Nil)
-                {
-                    node.Right.Left = minRightChild;
-                    if (minRightChild != Nil)
-                        minRightChild.Parent = node.Right;
-                }
-                node= null;
-                if(minNode.Color==Color.Black)
-                {
-                    //Fix Deletion.
-                }    
-            }
-            else // Node only has one child
-            {
-                // Replace the red node with the child node.
-                if(node.Color==Color.Red)
-                {
-                    RedBlackNode<T> newNode=ReplaceWithOnlyChild(node);
-                }
-                else //Node is black with one child  Double Black
-                {
-                    RedBlackNode<T> newNode = ReplaceWithOnlyChild(node);
-                    Color childColor=newNode.Color;
-                    if(childColor==Color.Red)
-                        newNode.Color = Color.Black;
-                    else
-                    {
-                        //Fix Deletion
-                    }
-                }
-            }
+            RemoveNode(nodeToDelete);
             Count--;
             return true;
         }
-        private void FixDeletion(RedBlackNode<T> node)
+        private void RemoveNode(RedBlackNode<T> nodeToDelete)
         {
-            RedBlackNode<T> sibling= (node.Left != Nil) ? node.Left : node.Right;
-            Color siblingColor=sibling.Color;
-            if(siblingColor==Color.Black)
+            RedBlackNode<T> y = nodeToDelete;
+            Color yOriginalColor = y.Color;
+            RedBlackNode<T> replacedNode;
+            if(nodeToDelete.Left==Nil)
             {
-                //Case 1: Sibing has at least one red node.
-                if (sibling.Left!=Nil||sibling.Right!=Nil)
+                replacedNode = nodeToDelete.Right;
+                Transplant(nodeToDelete, nodeToDelete.Right);
+            }
+            else if (nodeToDelete.Right==Nil)
+            {
+                replacedNode = nodeToDelete.Left;
+                Transplant(nodeToDelete,nodeToDelete.Left);
+            }
+            else
+            {
+                y=GetMinNode(nodeToDelete.Right);
+                yOriginalColor = y.Color;
+                replacedNode = y.Right;
+                if(y.Parent==nodeToDelete)
+                    replacedNode.Parent = y;
+                else
                 {
-                    if (sibling.Left.Color == Color.Red || sibling.Right.Color == Color.Red)
-                    {
-                        //LL Rotation
-                        if (sibling.Left.Color == Color.Red && sibling == node.Left)
-                        {
-                            sibling.Left.Color = sibling.Color;
-                            sibling.Color = node.Color;
-                            node.Color = Color.Black;
-                            RightRotation(node);
-                        }
-                        //RR Rotation
-                        if (sibling.Right.Color == Color.Red && sibling == node.Right)
-                        {
-                            sibling.Right.Color = sibling.Color;
-                            sibling.Color = node.Color;
-                            node.Color = Color.Black;
-                            LeftRotation(node);
-                        }
-                        //LR
-                        if (sibling.Left.Color != Color.Red && sibling.Right.Color == Color.Red && sibling == node.Left)
-                        {
-                            sibling.Right.Color = node.Color;
-                            node.Color = Color.Black;
-                            LeftRotation(sibling);
-                            RightRotation(node);
-                        }
-                        //RL
-                        if (sibling == node.Right && sibling.Right.Color != Color.Red && sibling.Left.Color == Color.Red)
-                        {
-                            sibling.Left.Color = node.Color;
-                            node.Color = Color.Black;
-                            RightRotation(sibling);
-                            LeftRotation(node);
-                        }
-                    }
-                
+                    Transplant(y, y.Right);
+                    y.Right = nodeToDelete.Right;
+                    y.Right.Parent = y;
                 }
-                //Case 2: Sibling has no red child
-                if(sibling.Left.Color==Color.Black&&sibling.Right.Color==Color.Black)
+                Transplant(nodeToDelete, y);
+                y.Left = nodeToDelete.Left;
+                y.Left.Parent = y;
+                y.Color = nodeToDelete.Color;
+            }
+            if (yOriginalColor == Color.Black)
+            {
+                FixDeletion(replacedNode);
+            }
+        }
+        private void FixDeletion(RedBlackNode<T> replacedNode)
+        {
+            while(replacedNode!=Root&&replacedNode.Color==Color.Black)
+            {
+                if(replacedNode==replacedNode.Parent.Left)
                 {
-                    sibling.Color = Color.Red;
-                    RedBlackNode<T> siblingOfDoubleBlack = GetSiblingNode(node);
-                    if(siblingOfDoubleBlack.Color==Color.Black)
+                    RedBlackNode<T> sibling=replacedNode.Parent.Right;
+                    //Case 1: Sibling node is Red
+                    if(sibling.Color==Color.Red)
                     {
-                        if(siblingOfDoubleBlack==node.Right&&siblingOfDoubleBlack.Right.Color==Color.Red)
+                        sibling.Color = Color.Black;
+                        replacedNode.Parent.Color=Color.Red;
+                        LeftRotation(replacedNode.Parent);
+                        sibling=replacedNode.Parent.Right;
+                    }
+                    //Case 2: Sibling has two black child node.
+                    if(sibling.Left.Color==Color.Black&&sibling.Right.Color==Color.Black)
+                    {
+                        sibling.Color= Color.Red;
+                        replacedNode=replacedNode.Parent;
+                    }
+                    else
+                    {
+                        //Case 3: Sibling right child is black, left child is red
+                        if(sibling.Right.Color==Color.Black)
                         {
-                            siblingOfDoubleBlack.Right.Color = siblingOfDoubleBlack.Color;
-                            siblingOfDoubleBlack.Color=node.Color;
-                            node.Color=Color.Black;
-                            LeftRotation(node);
+                            sibling.Left.Color = Color.Black;
+                            sibling.Color=Color.Red;
+                            RightRotation(sibling);
+                            sibling=replacedNode.Parent.Right;
                         }
+                        //Case 4: Sibling's right child is red.
+                        sibling.Color = replacedNode.Parent.Color;
+                        replacedNode.Parent.Color= Color.Black;
+                        sibling.Right.Color= Color.Black;
+                        LeftRotation(replacedNode.Parent);
+                        replacedNode = Root;
+                    }
+                }
+                else
+                {
+                    RedBlackNode<T> sibling = replacedNode.Parent.Left;
+                    if(sibling.Color==Color.Red)
+                    {
+                        sibling.Color = Color.Black;
+                        replacedNode.Parent.Color = Color.Red;
+                        RightRotation(replacedNode.Parent);
+                        sibling=replacedNode.Parent.Left;
+                    }
+                    if(sibling.Right.Color==Color.Black&&sibling.Left.Color==Color.Black)
+                    {
+                        sibling.Color = Color.Red;
+                        replacedNode = replacedNode.Parent;
+                    }
+                    else
+                    {
+                        if(sibling.Left.Color==Color.Black)
+                        {
+                            sibling.Right.Color = Color.Black;
+                            sibling.Color= Color.Red;
+                            LeftRotation(sibling);
+                            sibling=replacedNode.Parent.Left;
+                        }
+                        sibling.Color = replacedNode.Parent.Color;
+                        replacedNode.Parent.Color=Color.Black;
+                        sibling.Left.Color= Color.Black;
+                        RightRotation(replacedNode.Parent);
+                        replacedNode = Root;
                     }
                 }
             }
+            replacedNode.Color = Color.Black;
         }
-        private RedBlackNode<T> GetSiblingNode(RedBlackNode<T> node)
+        private void Transplant(RedBlackNode<T> u, RedBlackNode<T> v)
         {
-            RedBlackNode<T> sibling;
-            if(node==node.Parent.Left)
-                sibling = node.Right;
+            if (u.Parent == null || u.Parent == Nil)
+                Root = v;
+            else if(u==u.Parent.Left)
+                u.Parent.Left = v;
             else
-                sibling = node.Left;
-            return sibling;
-        }
-        private RedBlackNode<T> DeleteLeafNode(RedBlackNode<T> node)
-        {
-            RedBlackNode <T> parent=node.Parent;
-            if (node == parent.Left)
-                parent.Left = Nil;
-            else
-                parent.Right = Nil;
-            node=null;
-            return parent;
-        }
-        private RedBlackNode<T> ReplaceWithOnlyChild(RedBlackNode<T> node)
-        {
-            RedBlackNode<T> child = node.Left == Nil ? node.Right : node.Left;
-            child.Parent = node.Parent;
-            if (node == node.Parent.Left)
-                node.Parent.Left = child;
-            else
-                node.Parent.Right = child;
-            node = null;
-            return child;
+                u.Parent.Right = v;
+            v.Parent = u.Parent;
         }
         private void LeftRotation(RedBlackNode<T> node)
         {
