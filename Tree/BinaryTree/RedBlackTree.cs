@@ -619,7 +619,7 @@ namespace DSA.Tree.BinaryTree
             int right = GetNodeHeight(node.Right);
             return Math.Max(left, right)+1;
         }
-        public List<RedBlackNode<T>> InOrderTraversal()
+        public List<RedBlackNode<T>> GetAllNodeByInOrderTraversal()
         {
             List<RedBlackNode<T>> list= new List<RedBlackNode<T>>();
             InOrderTraversal(Root, list);

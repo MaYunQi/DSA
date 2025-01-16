@@ -1,6 +1,7 @@
 ﻿using DSA.Tree;
 using DSA.Tree.BinaryTree;
 using DSA.Tree.Interfaces;
+using DSA.Tree.Nodes;
 
 namespace DSA
 {
@@ -16,6 +17,7 @@ namespace DSA
                 int a=random.Next(0,100);
                 tree.Insert(i);    
             }
+            tree.PrintTheTree();
         }
     }
 }
