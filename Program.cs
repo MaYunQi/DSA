@@ -1,4 +1,5 @@
-﻿using DSA.Tree;
+﻿using DSA.Algorithms.Sort;
+using DSA.Tree;
 using DSA.Tree.BinaryTree;
 using DSA.Tree.Interfaces;
 using DSA.Tree.Nodes;
@@ -9,15 +10,23 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            RedBlackTree<int> tree = new RedBlackTree<int>();
-            tree.PrintTheTree();
-            for(int i=0;i<10;i++)
+            int[] array = new int[10];
+            for (int i = 0; i < 10; i++)
             {
                 Random random = new Random();
-                int a=random.Next(0,100);
-                tree.Insert(i);    
+                array[i] = random.Next(1,100);
+                //array[i] = i;
             }
-            tree.PrintTheTree();
+            foreach(int i in array)
+            {
+                Console.Write(i+" ");
+            }
+            Console.WriteLine();
+            SortHelper<int>.SelectionSort(array);
+            foreach (int i in array)
+            {
+                Console.Write(i + " ");
+            }
         }
     }
 }
