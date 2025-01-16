@@ -5,13 +5,12 @@ namespace DSA.Tree.BinaryTree
     public class RedBlackTree<T> where T : IComparable<T>,IEquatable<T>
     {
         private RedBlackNode<T> Nil;
-        public RedBlackNode<T> Root { get;private set; }
+        public RedBlackNode<T>? Root { get;private set; }
         public uint Count { get;private set; }
         public RedBlackTree() 
         {
-            Nil = new RedBlackNode<T>(default);
+            Nil = new RedBlackNode<T>();
             Nil.Color=Color.Black;
-            Root = Nil;
         }
         public RedBlackTree(T value)
         {
@@ -26,18 +25,18 @@ namespace DSA.Tree.BinaryTree
         public bool Insert(T value)
         {
             RedBlackNode<T> node=new RedBlackNode<T>(value);
+            node.Color= Color.Red;
             node.Left=node.Right = Nil;
-
             RedBlackNode<T> current = Root;
             RedBlackNode<T> parent = null;
-            while(current!=Nil)
+            while(current!=null&&!current.IsIdenticalTo(Nil))
             {
                 parent = current;
                 if (node == current)
                     return false;
                 if (node > current)
                     current = current.Right;
-                else
+                else if(node < current)
                     current = current.Left;
             }
             node.Parent = parent;
@@ -48,7 +47,6 @@ namespace DSA.Tree.BinaryTree
             else
                 parent.Left = node;
             Count++;
-            node.Color = Color.Red;
             FixInsert(node);
             return true;
         }
@@ -113,15 +111,17 @@ namespace DSA.Tree.BinaryTree
                         LeftRotation(node.Parent.Parent);
                     }
                 }
+                if (node == Root)
+                    break;
             }
             Root.Color=Color.Black;
         }
         public bool Remove(T value)
         {
-            if(Root==null||Root==Nil)
+            if(Root==null)
                 return true;
             RedBlackNode<T> nodeToDelete = GetNode(value);
-            if (nodeToDelete == null|| nodeToDelete == Nil)
+            if (nodeToDelete == null)
                 return true;
             RemoveNode(nodeToDelete);
             Count--;
@@ -132,12 +132,12 @@ namespace DSA.Tree.BinaryTree
             RedBlackNode<T> y = nodeToDelete;
             Color yOriginalColor = y.Color;
             RedBlackNode<T> replacedNode;
-            if(nodeToDelete.Left==Nil)
+            if(nodeToDelete.Left.IsIdenticalTo(Nil))
             {
                 replacedNode = nodeToDelete.Right;
                 Transplant(nodeToDelete, nodeToDelete.Right);
             }
-            else if (nodeToDelete.Right==Nil)
+            else if (nodeToDelete.Right.IsIdenticalTo(Nil))
             {
                 replacedNode = nodeToDelete.Left;
                 Transplant(nodeToDelete,nodeToDelete.Left);
@@ -172,6 +172,11 @@ namespace DSA.Tree.BinaryTree
                 if(replacedNode==replacedNode.Parent.Left)
                 {
                     RedBlackNode<T> sibling=replacedNode.Parent.Right;
+                    if(sibling==null||sibling.IsIdenticalTo(Nil))
+                    {
+                        replacedNode = replacedNode.Parent;
+                        continue;
+                    }
                     //Case 1: Sibling node is Red
                     if(sibling.Color==Color.Red)
                     {
@@ -207,7 +212,12 @@ namespace DSA.Tree.BinaryTree
                 else
                 {
                     RedBlackNode<T> sibling = replacedNode.Parent.Left;
-                    if(sibling.Color==Color.Red)
+                    if(sibling==null||sibling.IsIdenticalTo(Nil))
+                    {
+                        replacedNode = replacedNode.Parent;
+                        continue;
+                    }
+                    if (sibling.Color==Color.Red)
                     {
                         sibling.Color = Color.Black;
                         replacedNode.Parent.Color = Color.Red;
@@ -240,7 +250,7 @@ namespace DSA.Tree.BinaryTree
         }
         private void Transplant(RedBlackNode<T> u, RedBlackNode<T> v)
         {
-            if (u.Parent == null || u.Parent == Nil)
+            if (u.Parent == null)
                 Root = v;
             else if(u==u.Parent.Left)
                 u.Parent.Left = v;
@@ -252,7 +262,7 @@ namespace DSA.Tree.BinaryTree
         {
             RedBlackNode<T> y = node.Right;
             node.Right=y.Left;
-            if (y.Left != Nil)
+            if (!y.Left.IsIdenticalTo(Nil))
                 y.Left.Parent = node;
             y.Parent = node.Parent;
             if (node.Parent == null)
@@ -268,7 +278,7 @@ namespace DSA.Tree.BinaryTree
         {
             RedBlackNode<T> y = node.Left;
             node.Left=y.Right;
-            if(y.Right!=Nil)
+            if(!y.Right.IsIdenticalTo(Nil))
                 y.Right.Parent = node;
             y.Parent = node.Parent;
             if (node.Parent == null)
@@ -301,16 +311,16 @@ namespace DSA.Tree.BinaryTree
         }
         public RedBlackNode<T> GetNode(T value)
         {
-            if (Root == null || Root == Nil)
+            if (Root == null)    
                 return null;
             if (value == null)
                 return null;
             RedBlackNode<T> node=new RedBlackNode<T>(value);
             RedBlackNode<T> current = Root;
-            while(current!=Nil)
+            while(!current.IsIdenticalTo(Nil))
             {
                 if(node==current)
-                    return node;
+                    return current;
                 if(node>current)
                     current=current.Right;
                 if(node<current)
@@ -320,10 +330,10 @@ namespace DSA.Tree.BinaryTree
         }
         public RedBlackNode<T> GetMinNode()
         {
-            if (Root == null||Root==Nil)
+            if (Root == null)
                 return null;
             RedBlackNode<T> current = Root;
-            while(current.Left!=Nil)
+            while(!current.Left.IsIdenticalTo(Nil))
             {
                 current = current.Left;
             }
@@ -331,10 +341,10 @@ namespace DSA.Tree.BinaryTree
         }
         private RedBlackNode<T> GetMinNode(RedBlackNode<T> node)
         {
-            if (node == null || node == Nil)
+            if (node == null)
                 return null;
             RedBlackNode<T> current = node;
-            while(current.Left!=Nil)
+            while(!current.Left.IsIdenticalTo(Nil))
             {
                 current = current.Left;
             }
@@ -342,10 +352,10 @@ namespace DSA.Tree.BinaryTree
         }
         public RedBlackNode<T> GetMaxNode()
         {
-            if (Root == null || Root == Nil)
+            if (Root == null)
                 return null;
             RedBlackNode<T> current = Root;
-            while (current.Right != Nil)
+            while (!current.Right.IsIdenticalTo(Nil))
             {
                 current = current.Right;
             }
@@ -363,9 +373,9 @@ namespace DSA.Tree.BinaryTree
             {
                 RedBlackNode<T> node = stack.Pop();
                 list.Add(node);
-                if (node.Left!=Nil)
+                if (!node.Left.IsIdenticalTo(Nil))
                     stack.Push(node.Left);
-                if(node.Right!=Nil)
+                if(!node.Right.IsIdenticalTo(Nil))
                     stack.Push(node.Right);
             }
             return list;
@@ -382,9 +392,9 @@ namespace DSA.Tree.BinaryTree
             {
                 RedBlackNode<T> node= stack.Pop();
                 list.Add(node.Value);
-                if(node.Left!=Nil)
+                if(!node.Left.IsIdenticalTo(Nil))
                     stack.Push(node.Left);
-                if(node.Right!=Nil)
+                if(!node.Right.IsIdenticalTo(Nil))
                     stack.Push(node.Right);
             }
             return list;
@@ -400,11 +410,11 @@ namespace DSA.Tree.BinaryTree
             while (stack.Count > 0)
             {
                 RedBlackNode<T> node = stack.Pop();
-                if(node.Left==Nil&&node.Right== Nil)
+                if(node.Left.IsIdenticalTo(Nil) &&node.Right.IsIdenticalTo(Nil))
                     list.Add(node);
-                if (node.Left != Nil)
+                if (!node.Left.IsIdenticalTo(Nil))
                     stack.Push(node.Left);
-                if (node.Right != Nil)
+                if (!node.Right.IsIdenticalTo(Nil))
                     stack.Push(node.Right);
             }
             return list;
@@ -420,11 +430,11 @@ namespace DSA.Tree.BinaryTree
             while (stack.Count > 0)
             {
                 RedBlackNode<T> node = stack.Pop();
-                if (node.Left == Nil && node.Right == Nil)
+                if (node.Left.IsIdenticalTo(Nil) && node.Right.IsIdenticalTo(Nil))
                     list.Add(node.Value);
-                if (node.Left != Nil)
+                if (!node.Left.IsIdenticalTo(Nil))
                     stack.Push(node.Left);
-                if (node.Right != Nil)
+                if (!node.Right.IsIdenticalTo(Nil))
                     stack.Push(node.Right);
             }
             return list;
@@ -445,9 +455,9 @@ namespace DSA.Tree.BinaryTree
                     RedBlackNode <T> node = queue.Dequeue();
                     if (i==0)
                         list.Add(node);
-                    if(node.Left!= Nil)
+                    if(!node.Left.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Left);
-                    if(node.Right!= Nil)
+                    if(!node.Right.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Right);
                 }
             }
@@ -469,9 +479,9 @@ namespace DSA.Tree.BinaryTree
                     RedBlackNode<T> node = queue.Dequeue();
                     if (i == 0)
                         list.Add(node.Value);
-                    if (node.Left != Nil)
+                    if (!node.Left.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Left);
-                    if (node.Right != Nil)
+                    if (!node.Right.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Right);
                 }
             }
@@ -493,9 +503,9 @@ namespace DSA.Tree.BinaryTree
                     RedBlackNode<T> node = queue.Dequeue();
                     if (i == levelNodeCount-1)
                         list.Add(node);
-                    if (node.Left != Nil)
+                    if (!node.Left.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Left);
-                    if (node.Right != Nil)
+                    if (!node.Right.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Right);
                 }
             }
@@ -517,9 +527,9 @@ namespace DSA.Tree.BinaryTree
                     RedBlackNode<T> node = queue.Dequeue();
                     if (i == levelNodeCount - 1)
                         list.Add(node.Value);
-                    if (node.Left != Nil)
+                    if (!node.Left.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Left);
-                    if (node.Right != Nil)
+                    if (!node.Right.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Right);
                 }
             }
@@ -531,7 +541,7 @@ namespace DSA.Tree.BinaryTree
                 return false;
             RedBlackNode<T> node=new RedBlackNode<T>(value);
             RedBlackNode<T> current = Root;
-            while(current!= Nil)
+            while(!current.IsIdenticalTo(Nil))
             {
                 if(current==node)
                     return true;
@@ -546,7 +556,7 @@ namespace DSA.Tree.BinaryTree
         {
             if(Contains(node.Value))
             {
-                if (node.Left == Nil && node.Right == Nil)
+                if (node.Left.IsIdenticalTo(Nil) && node.Right.IsIdenticalTo(Nil))
                     return true;
             }
             return false;
@@ -574,9 +584,9 @@ namespace DSA.Tree.BinaryTree
                 for(int i=0;i<leveNodeCount;i++)
                 {
                     RedBlackNode<T> node = queue.Dequeue();
-                    if (node.Left!= Nil)
+                    if (!node.Left.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Left);
-                    if(node.Right!= Nil)
+                    if(!node.Right.IsIdenticalTo(Nil))
                         queue.Enqueue(node.Right);
                 }
                 height++;
@@ -587,7 +597,7 @@ namespace DSA.Tree.BinaryTree
         {
             RedBlackNode<T> current = Root;
             int depth = 0;
-            while(current!= Nil)
+            while(!current.IsIdenticalTo(Nil))
             {
                 if(current==node)
                     return depth;
@@ -603,7 +613,7 @@ namespace DSA.Tree.BinaryTree
         {
             if (node == null)
                 return -1;
-            if (node == Nil)
+            if (node.IsIdenticalTo(Nil))
                 return -1;
             int left = GetNodeHeight(node.Left);
             int right = GetNodeHeight(node.Right);
@@ -617,11 +627,36 @@ namespace DSA.Tree.BinaryTree
         }
         private void InOrderTraversal(RedBlackNode<T> root, List<RedBlackNode<T>> list)
         {
-            if (root == null||root==Nil)
+            if (root == null||root.IsIdenticalTo(Nil))
                 return;
             InOrderTraversal(root.Left, list);
             list.Add(root);
             InOrderTraversal(root.Right, list);
+        }
+        public void PrintTheTree()
+        {
+            if(Root == null)
+            {
+                Console.WriteLine("Tree is empty");
+                return;
+            }
+            RedBlackNode<T> node = Root;
+            Queue<RedBlackNode<T>> queue=new Queue<Nodes.RedBlackNode<T>> ();
+            queue.Enqueue(node);
+            while (queue.Count > 0) 
+            {
+                int leveNodeCount=queue.Count;
+                for(int i=0;i<leveNodeCount;i++)
+                {
+                    RedBlackNode<T> current = queue.Dequeue();
+                    Console.Write(current.Value + " : " + current.Color+"\t");
+                    if (!current.Left.IsIdenticalTo(Nil))
+                        queue.Enqueue(current.Left);
+                    if (!current.Right.IsIdenticalTo(Nil))
+                        queue.Enqueue(current.Right);
+                }
+                Console.WriteLine();
+            }
         }
     }
 }

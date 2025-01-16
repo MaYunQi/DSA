@@ -20,7 +20,7 @@ namespace DSA.Tree.Nodes
         }
         public static bool operator >(RedBlackNode<T> left, RedBlackNode<T> right)
         {
-            return left.Value.CompareTo(right.Value) < 0;
+            return left.Value.CompareTo(right.Value) > 0;
         }
         public static bool operator ==(RedBlackNode<T> left, RedBlackNode<T> right)
         {
@@ -35,6 +35,10 @@ namespace DSA.Tree.Nodes
         public static bool operator !=(RedBlackNode<T> left, RedBlackNode<T> right)
         {
             return !(left == right);
+        }
+        public bool IsIdenticalTo(RedBlackNode<T> right)
+        {
+            return ReferenceEquals(this, right);
         }
     }
     public enum Color

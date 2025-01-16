@@ -8,14 +8,14 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            IBinaryTree<int> tree = new AVLTree<int>();
+            RedBlackTree<int> tree = new RedBlackTree<int>();
+            tree.PrintTheTree();
             for(int i=0;i<10;i++)
             {
                 Random random = new Random();
                 int a=random.Next(0,100);
-                tree.Insert(a);    
+                tree.Insert(i);    
             }
-            tree.InOrderTraversal();
         }
     }
 }
