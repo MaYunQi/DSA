@@ -34,6 +34,10 @@
                 return false;
             return left.Value.Equals(right.Value);
         }
+        public bool IsIdenticalTo(TreeNode<T> right)
+        {
+            return ReferenceEquals(this, right);
+        }
         public static bool operator !=(TreeNode<T> left, TreeNode<T> right)
         {
             return !(left == right);

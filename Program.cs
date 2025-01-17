@@ -10,23 +10,14 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            int[] array = new int[10];
-            for (int i = 0; i < 10; i++)
+            MaxHeap<int> heap = new MaxHeap<int>();
+            Random random = new Random();
+            for (int i = 0; i < 31; i++) 
             {
-                Random random = new Random();
-                array[i] = random.Next(1,100);
-                //array[i] = i;
+                int number=random.Next(0,100);
+                heap.Insert(number);
             }
-            foreach(int i in array)
-            {
-                Console.Write(i+" ");
-            }
-            Console.WriteLine();
-            SortHelper<int>.MergeSort(array);
-            foreach (int i in array)
-            {
-                Console.Write(i + " ");
-            }
+            heap.PrintTheTree();
         }
     }
 }
