@@ -115,5 +115,63 @@ namespace DSA.Algorithms.Sort
             QuickSort(array, left, newPivot-1,rnd);
             QuickSort(array, newPivot+1, right, rnd);
         }
+        public static void MergeSort(T[] array)
+        {
+            if(array==null||array.Length<=1)
+                return;
+            int n= array.Length-1;
+            MergeSort(array, 0, n);
+        }
+        private static void MergeSort(T[] array,int left, int right)
+        {
+            if (left >= right)
+                return;
+            int mid = left + (right - left) / 2;
+            MergeSort(array, left, mid);
+            MergeSort(array, mid + 1, right);
+            Merge(array, left, mid, right);
+        }
+        private static void Merge(T[] array,int left,int mid,int right)
+        {
+            int nLeft = mid - left + 1;
+            int nRight = right - mid ;
+            T[] leftArray= new T[nLeft];
+            T[] rightArray= new T[nRight];
+            for(int i=0;i<nLeft;i++)
+            {
+                leftArray[i]=array[left+i];
+            }
+            for(int i=0;i<nRight;i++)
+            {
+                rightArray[i]=array[mid+i+1];
+            }
+            int iLeft = 0, iRight = 0, k = left;
+            while(iLeft<nLeft&&iRight<nRight)
+            {
+                if (leftArray[iLeft].CompareTo(rightArray[iRight]) <= 0)
+                {
+                    array[k]=leftArray[iLeft];
+                    iLeft++;
+                }
+                else
+                {
+                    array[k]=rightArray[iRight];
+                    iRight++;
+                }
+                k++;
+            }
+            while(iLeft<nLeft)
+            {
+                array[k]=leftArray[iLeft];
+                iLeft++;
+                k++;
+            }
+            while(iRight<nRight)
+            {
+                array[k]=rightArray[iRight];
+                iRight ++;
+                k++;
+            }
+        }
     }
 }
