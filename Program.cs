@@ -22,7 +22,7 @@ namespace DSA
                 Console.Write(i+" ");
             }
             Console.WriteLine();
-            SortHelper<int>.SelectionSort(array);
+            SortHelper<int>.QuickSort(array);
             foreach (int i in array)
             {
                 Console.Write(i + " ");

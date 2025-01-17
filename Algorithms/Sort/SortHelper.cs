@@ -68,10 +68,52 @@ namespace DSA.Algorithms.Sort
         {
             if (array == null || array.Length <= 1)
                 return;
-            //int pivot
-            int n=array.Length;
-            Random rnd = new Random();
-            int pivot=rnd.Next(0, n);
+            int n=array.Length-1;
+            Random random = new Random();
+            QuickSort(array, 0, n, random);
+        }
+        private static int Partition(T[] array, int left, int right, int pivot)
+        {
+            T pivotValue = array[pivot];
+
+            T temp = array[right];
+            array[right] = array[pivot];
+            array[pivot] = temp;
+
+            pivot = right;  
+            right--;
+            while (left <= right)
+            {
+                while (left <= right && array[left].CompareTo(pivotValue) < 0)
+                {
+                    left++;
+                }
+                while (left <= right && array[right].CompareTo(pivotValue) > 0)
+                {
+                    right--;
+                }
+                if (left <= right)
+                {
+                    temp = array[right];
+                    array[right] = array[left];
+                    array[left] = temp;
+                    left++;
+                    right--;
+                }
+            }
+            temp = array[left];
+            array[left] = array[pivot];
+            array[pivot] = temp;
+            return left;
+        }
+        private static void QuickSort(T[] array,int left,int right,Random rnd)
+        {
+            if (left >= right)
+                return;
+            int pivot= rnd.Next(left, right+1);
+            int newPivot=Partition(array, left,right ,pivot);
+            QuickSort(array, left, newPivot-1,rnd);
+            QuickSort(array, newPivot+1, right, rnd);
         }
     }
 }
