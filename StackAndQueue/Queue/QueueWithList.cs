@@ -1,5 +1,4 @@
-﻿
-using DSA.List;
+﻿using DSA.Lists;
 using DSA.StackAndQueue.Interfaces;
 
 namespace DSA.StackAndQueue.Queue
