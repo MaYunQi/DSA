@@ -10,13 +10,17 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            MaxHeap<int> heap = new MaxHeap<int>();
+            MinHeap<int> heap = new MinHeap<int>();
             Random random = new Random();
             for (int i = 0; i < 31; i++) 
             {
                 int number=random.Next(0,100);
                 heap.Insert(number);
             }
+            heap.PrintTheTree();
+            Console.WriteLine();
+            int remove=Convert.ToInt32(Console.ReadLine());
+            heap.Remove(remove);
             heap.PrintTheTree();
         }
     }

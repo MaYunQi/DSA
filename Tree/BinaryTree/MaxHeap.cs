@@ -4,7 +4,7 @@ namespace DSA.Tree.BinaryTree
 {
     public class MaxHeap<T> where T : IComparable<T>, IEquatable<T>
     {
-        public TreeNode<T>? Root { get; set; }
+        public TreeNode<T>? Root { get;private set; }
         public uint Count { get; private set; }
         public MaxHeap() { }
         public MaxHeap(T value)
@@ -51,39 +51,85 @@ namespace DSA.Tree.BinaryTree
                 return;
             if (value.CompareTo(Root.Value) > 0)
                 return;
-            Stack<TreeNode<T>>  nodeStack=GetNodeStackByValue(value);
-            if(nodeStack == null||nodeStack.Count==0)
+            Stack<TreeNode<T>> nodeStack = GetNodeStackByValue(value);
+            if (nodeStack == null || nodeStack.Count == 0)
                 return;
-            while (nodeStack.Count > 0) 
+            while (nodeStack.Count > 0)
             {
-                TreeNode<T> nodeToRemove= nodeStack.Pop();
+                TreeNode<T> nodeToRemove = nodeStack.Pop();
                 TreeNode<T> lastNode = GetLastNode();
+                SwapNodeValue(nodeToRemove, lastNode);
                 TreeNode<T> parent = GetParentNode(lastNode);
                 if (lastNode == parent.Left)
                     parent.Left = null;
                 else
                     parent.Right = null;
-                // Conditions for shift down.
+                if (nodeToRemove.Left == null && nodeToRemove.Right == null)
+                {
+                    parent = GetParentNode(nodeToRemove);
+                    if (nodeToRemove.Value.CompareTo(parent.Value) > 0)
+                        BubbleUp(nodeToRemove, parent);
+                }
+                TreeNode<T> child = GetTheLargerChildNode(nodeToRemove);
+                ShiftDown(nodeToRemove, child);
                 Count--;
             }
         }
+        public void RemoveRoot()
+        {
+            if(Root.Left==null&&Root.Right==null)
+            {
+                Root = null;
+                Count--;
+                return;
+            }
+            TreeNode<T> lastNode= GetLastNode();
+            SwapNodeValue(Root, lastNode);
+            TreeNode<T> parentOfLast= GetParentNode(lastNode);
+            if(lastNode==parentOfLast.Left)
+                parentOfLast.Left = null;
+            else
+                parentOfLast.Right = null;
+            TreeNode<T> nodeToRemove = Root;
+            TreeNode<T> child= GetTheLargerChildNode(nodeToRemove);
+            ShiftDown(nodeToRemove, child);
+            Count--;
+        }
+        private TreeNode<T> GetTheLargerChildNode(TreeNode<T> node)
+        {
+            if (node == null)
+                return null;
+            TreeNode<T> largerChild;
+            if (node.Left != null && node.Right != null)
+                largerChild = node.Left.Value.CompareTo(node.Right.Value) > 0 ? node.Left : node.Right;
+            else if (node.Left == null && node.Right == null)
+                largerChild = null;
+            else
+                largerChild = node.Left;
+            return largerChild;
+        }
         public void ShiftDown(TreeNode<T> node, TreeNode<T> child)
         {
-
+            while (child != null && node.Value.CompareTo(child.Value) < 0)
+            {
+                SwapNodeValue(node, child);
+                node = child;
+                child=GetTheLargerChildNode(node);
+            }
         }
         private TreeNode<T> GetLastNode()
         {
             if (Root == null)
                 return null;
-            TreeNode<T> current= Root;
+            TreeNode<T> current = Root;
             Queue<TreeNode<T>> queue = new Queue<TreeNode<T>>();
             queue.Enqueue(current);
-            while (queue.Count > 0) 
+            while (queue.Count > 0)
             {
                 current = queue.Dequeue();
-                if(current.Left!=null)
+                if (current.Left != null)
                     queue.Enqueue(current.Left);
-                if(current.Right!=null)
+                if (current.Right != null)
                     queue.Enqueue(current.Right);
             }
             return current;
@@ -172,7 +218,7 @@ namespace DSA.Tree.BinaryTree
         public Stack<TreeNode<T>> GetNodeStackByValue(T value)
         {
             Stack<TreeNode<T>> nodeStack = new Stack<TreeNode<T>>();
-            if (value == null||Root==null)
+            if (value == null || Root == null)
                 return nodeStack;
             TreeNode<T> current = Root;
             Queue<TreeNode<T>> quque = new Queue<TreeNode<T>>();
@@ -182,15 +228,23 @@ namespace DSA.Tree.BinaryTree
                 TreeNode<T> node = quque.Dequeue();
                 if (value.Equals(node.Value))
                     nodeStack.Push(node);
-                else
-                {
-                    if (node.Left != null)
-                        quque.Enqueue(node.Left);
-                    if (node.Right != null)
-                        quque.Enqueue(node.Right);
-                }
+                if (node.Left != null)
+                    quque.Enqueue(node.Left);
+                if (node.Right != null)
+                    quque.Enqueue(node.Right);
             }
             return nodeStack;
+        }
+        public T GetMaxValue()
+        {
+            if (Root == null)
+                throw new NullReferenceException("Heap is null.");
+            return Root.Value;
+        }
+        public void Clear()
+        {
+            Root = null;
+            Count = 0;
         }
         public void PrintTheTree()
         {
@@ -208,7 +262,7 @@ namespace DSA.Tree.BinaryTree
                 for (int i = 0; i < leveNodeCount; i++)
                 {
                     TreeNode<T> current = queue.Dequeue();
-                    Console.Write(current.Value + " " + "\t");
+                    Console.Write(current.Value + "\t");
                     if (current.Left != null)
                         queue.Enqueue(current.Left);
                     if (current.Right != null)
