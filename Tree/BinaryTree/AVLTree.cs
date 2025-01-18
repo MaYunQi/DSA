@@ -6,32 +6,56 @@ namespace DSA.Tree.BinaryTree
     public class AVLTree<T> : BinarySearchTree<T>, IBinaryTree<T> where T : IComparable<T>, IEquatable<T>
     {
         public TreeNode<T> Root { get; private set; }
+        public uint Count { get; private set; }
+        public AVLTree() { }
+        public AVLTree(TreeNode<T> node)
+        {
+            Root = node;
+            Count = 1;
+        }
+        public AVLTree(T value)
+        {
+            Root= new TreeNode<T>(value);
+            Count = 1;
+        }
         public override bool Insert(T value)
         {
             bool result = base.Insert(value);
             if (result)
+            {
                 BalanceTree();
+                Count++;
+            }
             return result;
         }
         public override bool InsertRecursively(T value)
         {
             bool result = base.InsertRecursively(value);
             if (result)
+            {
                 BalanceTree();
+                Count++;
+            }
             return result;
         }
         public override bool Remove(T value)
         {
             bool result = base.Remove(value);
             if (result)
+            {
                 BalanceTree();
+                Count--;
+            }
             return result;
         }
         public override bool RemoveRecursively(T value)
         {
             bool result = base.RemoveRecursively(value);
             if (result)
+            {
                 BalanceTree();
+                Count++;
+            }
             return result;
         }
         private Stack<TreeNode<T>> GetUnbalancedNode()

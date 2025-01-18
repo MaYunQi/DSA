@@ -22,6 +22,7 @@ namespace DSA.Tree.BinaryTree
             Root.Right = Nil;
             Count = 1;
         }
+        public RedBlackTree(RedBlackNode<T> node) :this(node.Value) { }
         public bool Insert(T value)
         {
             RedBlackNode<T> node=new RedBlackNode<T>(value);

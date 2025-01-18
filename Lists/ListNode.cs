@@ -1,5 +1,5 @@
 ﻿
-namespace DSA.List
+namespace DSA.Lists
 {
     public class ListNode<T> where T : IComparable<T>,IEquatable<T>
     {
@@ -33,8 +33,6 @@ namespace DSA.List
         }
         public static bool operator ==(ListNode<T> left, ListNode<T> right)
         {
-            if(ReferenceEquals(left,right))
-                return true;
             if(left is null && right is null)
                 return true;
             if(left is null || right is null)

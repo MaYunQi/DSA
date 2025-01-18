@@ -1,5 +1,5 @@
 ﻿
-namespace DSA.List
+namespace DSA.Lists
 {
     public class MyLinkedList<T> where T : IComparable<T>, IEquatable<T>
     {

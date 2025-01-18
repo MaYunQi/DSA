@@ -26,8 +26,6 @@
         }
         public static bool operator ==(TreeNode<T> left, TreeNode<T> right)
         {
-            if(ReferenceEquals(left,right))
-                return true;
             if (left is null && right is null)
                 return true;
             if (left is null || right is null)

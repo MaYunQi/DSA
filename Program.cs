@@ -1,8 +1,5 @@
-﻿using DSA.Algorithms.Sort;
-using DSA.Tree;
-using DSA.Tree.BinaryTree;
-using DSA.Tree.Interfaces;
-using DSA.Tree.Nodes;
+﻿using DSA.Graphs;
+using DSA.Graphs.Entities;
 
 namespace DSA
 {
@@ -10,18 +7,27 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            MinHeap<int> heap = new MinHeap<int>();
-            Random random = new Random();
-            for (int i = 0; i < 31; i++) 
+            Graph<int> graph=new Graph<int>(10);
+
+            Vertex<int> v1=new Vertex<int>(17);
+            graph.LinkVertexToGenesisVertex(v1);
+           
+            Vertex<int> v2=new Vertex<int>(21);
+            v2.AddEdge(v1);
+            Vertex<int> v3 = new Vertex<int>(7);
+            v3.AddEdge(v1);
+            Vertex<int> v4 = new Vertex<int>(154);
+            v4.AddEdge(v2);
+            v3.AddEdge(v4);
+            Vertex<int> v5 = new Vertex<int>(45);
+            v5.AddEdge(v2);
+
+
+            List<Vertex<int>> list=graph.GetAllVerticesByDFS();
+            foreach (Vertex<int> vertex in list) 
             {
-                int number=random.Next(0,100);
-                heap.Insert(number);
+                Console.Write(vertex.Value+"\t");
             }
-            heap.PrintTheTree();
-            Console.WriteLine();
-            int remove=Convert.ToInt32(Console.ReadLine());
-            heap.Remove(remove);
-            heap.PrintTheTree();
         }
     }
 }

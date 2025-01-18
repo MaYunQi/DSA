@@ -24,8 +24,6 @@ namespace DSA.Tree.Nodes
         }
         public static bool operator ==(RedBlackNode<T> left, RedBlackNode<T> right)
         {
-            if(ReferenceEquals(left,right))
-                return true;
             if (left is null && right is null)
                 return true;
             if(left is null || right is null)
