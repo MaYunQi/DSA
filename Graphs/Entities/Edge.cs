@@ -24,24 +24,6 @@ namespace DSA.Graphs.Entities
             To = to;
             Weight = weight;
         }
-        public void AddEdge(Vertex<T> from, Vertex<T> to)
-        {
-            From = from;
-            To = to;
-            Weight = 1;
-        }
-        public void AddEdge(Vertex<T> from, Vertex<T> to, int weight)
-        {
-            From = from;
-            To = to;
-            Weight = weight;
-        }
-        public void RemoveEdge(Vertex<T> from, Vertex<T> to)
-        {
-            From = null;
-            To = null;
-            Weight = -1;
-        }
         public void SetWeight(int weight)
         {
             Weight = weight;

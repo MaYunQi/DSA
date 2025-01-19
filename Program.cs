@@ -7,27 +7,26 @@ namespace DSA
     {
         static void Main(string[] args)
         {
-            Graph<int> graph=new Graph<int>(10);
-
-            Vertex<int> v1=new Vertex<int>(17);
-            graph.LinkVertexToGenesisVertex(v1);
-           
-            Vertex<int> v2=new Vertex<int>(21);
-            v2.AddEdge(v1);
-            Vertex<int> v3 = new Vertex<int>(7);
-            v3.AddEdge(v1);
-            Vertex<int> v4 = new Vertex<int>(154);
-            v4.AddEdge(v2);
-            v3.AddEdge(v4);
-            Vertex<int> v5 = new Vertex<int>(45);
-            v5.AddEdge(v2);
-
-
-            List<Vertex<int>> list=graph.GetAllVerticesByDFS();
-            foreach (Vertex<int> vertex in list) 
+            WGraph<int> graph = new WGraph<int>(10);
+            Random rand1 = new Random();
+            Random rand2 = new Random();
+            for (int i = 0; i < 5; i++) 
             {
-                Console.Write(vertex.Value+"\t");
+                int x = rand1.Next(0,101);
+                int w = rand2.Next(1,21);
+                Vertex<int> vertex = new Vertex<int>(x);
+                graph.LinkVertexToGenesisVertex(vertex, w);
             }
+            Vertex<int> v1 = new Vertex<int>(130);
+            graph.AddVertex(v1);
+            Vertex<int> v2 = new Vertex<int>(180);
+            graph.AddVertex(v2);
+            graph.AddEdge(v1, v2,25);
+            Vertex<int> v3 = new Vertex<int>(200);
+            graph.AddVertex(v3);
+            graph.AddEdge(v3, v1,30);
+            //graph.RemoveVertex(v1); 
+            graph.PrintGraph();
         }
     }
 }

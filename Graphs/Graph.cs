@@ -3,6 +3,10 @@ using DSA.Graphs.Interfaces;
 
 namespace DSA.Graphs
 {
+    /// <summary>
+    /// Unweighted, undrectional graph
+    /// </summary>
+    /// <typeparam name="T">Generics type</typeparam>
     public class Graph<T> : IGraph<T> where T : IEquatable<T>
     {
         public Vertex<T> GenesisVertex { get; private set; }
@@ -50,8 +54,18 @@ namespace DSA.Graphs
         }
         private void RemoveConnection(Vertex<T> vertex)
         {
-            Edges.RemoveWhere(v => v.To!=null&&v.To.IsIdenticalTo(vertex));
-            Edges.RemoveWhere(v => v.From.IsIdenticalTo(vertex));
+            List<Edge<T>> edges = Edges.Where(e => e.To.IsIdenticalTo(vertex)).ToList();
+            for (int i = 0; i < edges.Count; i++)
+            {
+                Vertex<T> from = edges[i].From;
+                Edges.Remove(edges[i]);
+                Edges.Add(new Edge<T>(from, null,-1));
+            }
+            edges= Edges.Where(e => e.From.IsIdenticalTo(vertex)).ToList();
+            for (int i = 0; i < edges.Count; i++)
+            {
+                Edges.Remove(edges[i]);
+            }
         }
         public void RemoveValue(T value)
         {
@@ -161,15 +175,21 @@ namespace DSA.Graphs
             }
             return list;
         }
-        public void AddEdge(Vertex<T> left, Vertex<T> right)
+        public void AddEdge(Vertex<T> from, Vertex<T> to)
         {
-            Edges.Add(new Edge<T>(left, right));
-            Edges.Add(new Edge<T>(right, left));
+            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
+            if(edge!=null)
+                Edges.Remove(edge);
+            Edges.Add(new Edge<T>(from, to));
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to) && v.To == null);
+            if(edge!=null)
+                Edges.Remove(edge);
+            Edges.Add(new Edge<T>(to, from));
         }
-        public void RemoveEdge(Vertex<T> left, Vertex<T> right)
+        public void RemoveEdge(Vertex<T> from, Vertex<T> to)
         {
-            Edges.RemoveWhere(edge=>edge.From.IsIdenticalTo(left)&&edge.To.IsIdenticalTo(right));
-            Edges.RemoveWhere(edge => edge.From.IsIdenticalTo(right) && edge.To.IsIdenticalTo(left));
+            Edges.RemoveWhere(edge=>edge.From.IsIdenticalTo(from) &&edge.To.IsIdenticalTo(to));
+            Edges.RemoveWhere(edge => edge.From.IsIdenticalTo(to) && edge.To.IsIdenticalTo(from));
         }
         public Vertex<T> GetFirstVerticsByValue(T value)
         {
@@ -207,6 +227,13 @@ namespace DSA.Graphs
                     return vertex;
             }
             return null;
+        }
+        public int GetDegreeOfVertex(Vertex<T> vertex)
+        {
+            if (vertex == null || Count == 0)
+                return -1;
+            List<Edge<T>> edges=Edges.Where(v=>v.To!=null&&v.From.IsIdenticalTo(vertex)).ToList();
+            return edges.Count;
         }
         public List<Vertex<T>> GetAllVerticesByDFS()
         {
@@ -270,8 +297,24 @@ namespace DSA.Graphs
         {
             if (node == null||GenesisVertex==null)
                 return;
+            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(GenesisVertex) && v.To == null);
+            if (edge!=null) 
+                Edges.Remove(edge);
             Edges.Add(new Edge<T>(GenesisVertex, node));
             Edges.Add(new Edge<T>(node, GenesisVertex));
+        }
+        public virtual void PrintGraph()
+        {
+            Console.WriteLine("From: "+"\t"+"To: ");
+            Console.WriteLine("----------------------");
+            foreach (var edge in Edges)
+            {
+                if(edge.To!=null)
+                    Console.WriteLine(edge.From.Value+"\t"+edge.To.Value);
+                else
+                    Console.WriteLine(edge.From.Value + "\t" + "Null");
+            }
+            Console.WriteLine("----------------------");
         }
     }
 }
