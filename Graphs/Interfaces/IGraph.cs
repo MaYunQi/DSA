@@ -11,7 +11,6 @@ namespace DSA.Graphs.Interfaces
         void AddVertex(Vertex<T> vertex);
         void AddValue(T value);
         void AddEdge(Vertex<T> left, Vertex<T> right);
-        void LinkVertexTo(Vertex<T> node, Vertex<T> to);
         void LinkVertexToGenesisVertex(Vertex<T> node);
         void RemoveVertex(Vertex<T> vertex);
         void RemoveValue(T value);

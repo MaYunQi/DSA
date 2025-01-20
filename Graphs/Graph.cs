@@ -125,26 +125,45 @@ namespace DSA.Graphs
             }
             return set.ToList();
         }
+        public HashSet<Vertex<T>> GetHashSetOfAllVertics()
+        {
+            HashSet<Vertex<T>> set = new HashSet<Vertex<T>>();
+            if (Count == 0)
+                return set;
+            foreach (var edge in Edges)
+            {
+                set.Add(edge.From);
+                if (edge.To != null)
+                    set.Add(edge.To);
+            }
+            return set;
+        }
         public List<T> GetAllValueByDFS()
         {
             List<T> list= new List<T>();
             if(Count==0)
                 return list;
-            Stack<Vertex<T>> stack= new Stack<Vertex<T>>();
-            HashSet<Vertex<T>> visited= new HashSet<Vertex<T>>();
-            stack.Push(GenesisVertex);
-            while(stack.Count > 0)
+            HashSet<Vertex<T>> verticsSet = GetHashSetOfAllVertics();
+            while(verticsSet.Count>0)
             {
-                Vertex<T> vertex= stack.Pop();
-                if(!visited.Contains(vertex))
+                Vertex<T> v= verticsSet.FirstOrDefault();
+                Stack<Vertex<T>> stack = new Stack<Vertex<T>>();
+                HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
+                stack.Push(v);
+                while (stack.Count > 0)
                 {
-                    visited.Add(vertex);
-                    list.Add(vertex.Value);
-                    List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
-                    foreach(Edge<T> edge in edges)
+                    Vertex<T> vertex = stack.Pop();
+                    if (!visited.Contains(vertex))
                     {
-                        if(edge.To!=null&&!visited.Contains(edge.To))
-                            stack.Push(edge.To);
+                        visited.Add(vertex);
+                        verticsSet.Remove(vertex);
+                        list.Add(vertex.Value);
+                        List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
+                        foreach (Edge<T> edge in edges)
+                        {
+                            if (edge.To != null && !visited.Contains(edge.To))
+                                stack.Push(edge.To);
+                        }
                     }
                 }
             }
@@ -155,21 +174,60 @@ namespace DSA.Graphs
             List<T> list = new List<T>();
             if (Count == 0)
                 return list;
-            Queue<Vertex<T>> queue = new Queue<Vertex<T>>();
-            HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
-            queue.Enqueue(GenesisVertex);
-            while (queue.Count > 0)
+            HashSet<Vertex<T>> verticsSet=GetHashSetOfAllVertics();
+            while (verticsSet.Count > 0)
             {
-                Vertex<T> vertex = queue.Dequeue();
+                Vertex<T> v=verticsSet.FirstOrDefault();
+                Queue<Vertex<T>> queue = new Queue<Vertex<T>>();
+                HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
+                queue.Enqueue(v);
+                while (queue.Count > 0)
+                {
+                    Vertex<T> vertex = queue.Dequeue();
+                    if (!visited.Contains(vertex))
+                    {
+                        visited.Add(vertex);
+                        verticsSet.Remove(vertex);
+                        list.Add(vertex.Value);
+                        List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
+                        foreach (Edge<T> edge in edges)
+                        {
+                            if (edge.To != null && !visited.Contains(edge.To))
+                                queue.Enqueue(edge.To);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+        public bool CheckConnectivity()
+        {
+            if(Count==0)
+                return false;
+            List<Vertex<T>> a = GetVerticesDFSFromGenesis();
+            HashSet<Vertex<T>> b = GetHashSetOfAllVertics();
+            return a.Count == b.Count;
+        }
+        public List<Vertex<T>> GetVerticesDFSFromGenesis()
+        {
+            List<Vertex<T>> list = new List<Vertex<T>>();
+            if (Count==0)
+                return list;
+            Stack<Vertex<T>> stack = new Stack<Vertex<T>>();
+            HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
+            stack.Push(GenesisVertex);
+            while (stack.Count > 0)
+            {
+                Vertex<T> vertex = stack.Pop();
                 if (!visited.Contains(vertex))
                 {
                     visited.Add(vertex);
-                    list.Add(vertex.Value);
-                    List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
+                    list.Add(vertex);
+                    List<Edge<T>> edges = Edges.Where(e => e.From.IsIdenticalTo(vertex)).ToList();
                     foreach (Edge<T> edge in edges)
                     {
                         if (edge.To != null && !visited.Contains(edge.To))
-                            queue.Enqueue(edge.To);
+                            stack.Push(edge.To);
                     }
                 }
             }
@@ -177,7 +235,13 @@ namespace DSA.Graphs
         }
         public void AddEdge(Vertex<T> from, Vertex<T> to)
         {
-            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
+            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from));
+            if(edge==null)
+                Count++;
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to));
+            if(edge==null)
+                Count++;
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
             if(edge!=null)
                 Edges.Remove(edge);
             Edges.Add(new Edge<T>(from, to));
@@ -240,21 +304,27 @@ namespace DSA.Graphs
             List <Vertex<T>> list = new List<Vertex<T>>();
             if(Count==0)
                 return list;
-            Stack<Vertex<T>> stack= new Stack<Vertex<T>>();
-            HashSet<Vertex<T>> visited= new HashSet<Vertex<T>>();
-            stack.Push(GenesisVertex);
-            while (stack.Count > 0)
+            HashSet<Vertex<T>> verticsSet=GetHashSetOfAllVertics();
+            while(verticsSet.Count > 0)
             {
-                Vertex<T> vertex = stack.Pop();
-                if(!visited.Contains(vertex))
+                Vertex<T> v=verticsSet.FirstOrDefault();
+                Stack<Vertex<T>> stack = new Stack<Vertex<T>>();
+                HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
+                stack.Push(v);
+                while (stack.Count > 0)
                 {
-                    visited.Add(vertex);
-                    list.Add(vertex);
-                    List<Edge<T>> edges = Edges.Where(e=>e.From.IsIdenticalTo(vertex)).ToList();
-                    foreach(Edge<T> edge in edges)
+                    Vertex<T> vertex = stack.Pop();
+                    if (!visited.Contains(vertex))
                     {
-                        if(edge.To!=null&&!visited.Contains(edge.To))
-                            stack.Push(edge.To);
+                        visited.Add(vertex);
+                        verticsSet.Remove(vertex);
+                        list.Add(vertex);
+                        List<Edge<T>> edges = Edges.Where(e => e.From.IsIdenticalTo(vertex)).ToList();
+                        foreach (Edge<T> edge in edges)
+                        {
+                            if (edge.To != null && !visited.Contains(edge.To))
+                                stack.Push(edge.To);
+                        }
                     }
                 }
             }
@@ -265,33 +335,31 @@ namespace DSA.Graphs
             List<Vertex<T>> list = new List<Vertex<T>>();
             if (Count == 0)
                 return list;
-            Queue<Vertex<T>> queue = new Queue<Vertex<T>>();
-            HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
-            queue.Enqueue(GenesisVertex);
-            while (queue.Count > 0) 
+            HashSet<Vertex<T>> verticsSet=GetHashSetOfAllVertics();
+            while (verticsSet.Count > 0)
             {
-                Vertex<T> vertex= queue.Dequeue();
-                if (!visited.Contains(vertex)) 
+                Vertex<T> v=verticsSet.FirstOrDefault();
+                Queue<Vertex<T>> queue = new Queue<Vertex<T>>();
+                HashSet<Vertex<T>> visited = new HashSet<Vertex<T>>();
+                queue.Enqueue(v);
+                while (queue.Count > 0)
                 {
-                    visited.Add(vertex);
-                    list.Add(vertex);
-                    List<Edge<T>> edges=Edges.Where(v=>v.From.IsIdenticalTo(vertex)).ToList();
-                    foreach (Edge<T> edge in edges)
+                    Vertex<T> vertex = queue.Dequeue();
+                    if (!visited.Contains(vertex))
                     {
-                        if(edge.To!=null&&!visited.Contains(edge.To))
-                            queue.Enqueue(edge.To);
+                        visited.Add(vertex);
+                        verticsSet.Remove(vertex);
+                        list.Add(vertex);
+                        List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
+                        foreach (Edge<T> edge in edges)
+                        {
+                            if (edge.To != null && !visited.Contains(edge.To))
+                                queue.Enqueue(edge.To);
+                        }
                     }
                 }
             }
             return list;
-        }
-        public void LinkVertexTo(Vertex<T> node, Vertex<T> to)
-        {
-            if(node!=null&&to!=null)
-            {
-                Edges.Add(new Edge<T>(node,to));
-                Edges.Add(new Edge<T>(to, node));
-            }
         }
         public void LinkVertexToGenesisVertex(Vertex<T> node)
         {
@@ -300,6 +368,9 @@ namespace DSA.Graphs
             Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(GenesisVertex) && v.To == null);
             if (edge!=null) 
                 Edges.Remove(edge);
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(node));
+            if(edge==null)
+                Count++;
             Edges.Add(new Edge<T>(GenesisVertex, node));
             Edges.Add(new Edge<T>(node, GenesisVertex));
         }
@@ -315,6 +386,10 @@ namespace DSA.Graphs
                     Console.WriteLine(edge.From.Value + "\t" + "Null");
             }
             Console.WriteLine("----------------------");
+        }
+        protected void AddCountByOne()
+        {
+            Count++;
         }
     }
 }

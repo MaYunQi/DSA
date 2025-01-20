@@ -13,7 +13,13 @@ namespace DSA.Graphs
         public WGraph(Vertex<T> vertex) : base(vertex) { }
         public void AddEdge(Vertex<T> from, Vertex<T> to, int weight)
         {
-            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
+            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from));
+            if (edge == null)
+                AddCountByOne();
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to));
+            if (edge == null)
+                AddCountByOne();
+            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
             if (edge != null)
                 Edges.Remove(edge);
             Edges.Add(new Edge<T>(from, to,weight));
@@ -24,14 +30,12 @@ namespace DSA.Graphs
         }
         public void ChangeWeight(Vertex<T> from, Vertex<T> to, int weight)
         {
-            AddEdge(from, to, weight);
-        }
-        public void LinkVertexTo(Vertex<T> node, Vertex<T> to, int weight)
-        {
-            if (node != null && to != null)
-            {
-                AddEdge(node, to, weight);
-            }
+            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from)&&v.To.IsIdenticalTo(to));
+            Edges.Remove(edge);
+            edge= Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to) && v.To.IsIdenticalTo(from));
+            Edges.Remove(edge);
+            Edges.Add(new Edge<T>(from, to, weight));
+            Edges.Add(new Edge<T>(to, from, weight));
         }
         public void LinkVertexToGenesisVertex(Vertex<T> node,int weight)
         {
@@ -39,12 +43,39 @@ namespace DSA.Graphs
                 return;
             AddEdge(node, GenesisVertex, weight);
         }
-        public int GetShortestPath(Vertex<T> from, Vertex<T> to)
+        public List<Edge<T>> GetMinimalSpanningTreePrim()
         {
-            if(Count==0)
-                return 0;
-
-            return 1;
+            List<Edge<T>> mst= new List<Edge<T>>();
+            if(Count==0|| !CheckConnectivity())
+                return mst;
+            HashSet<Vertex<T>> connectedVertics = new HashSet<Vertex<T>>();
+            connectedVertics.Add(GenesisVertex);
+            while (connectedVertics.Count!=Count)
+            {
+                List<Edge<T>> edges=new List<Edge<T>>();
+                foreach (var vertex in connectedVertics)
+                {
+                    List<Edge<T>> list = Edges.Where(e => e.From.IsIdenticalTo(vertex) && e.To != null&&!connectedVertics.Contains(e.To)).ToList();
+                    edges.AddRange(list);
+                }
+                if (edges != null || edges.Count != 0)
+                {
+                    Edge<T> shortestEdge = edges.MinBy(e => e.Weight);
+                    mst.Add(shortestEdge);
+                    connectedVertics.Add(shortestEdge.To);
+                }
+                else
+                    return null;
+            }
+            return mst;
+        }
+        public List<Edge<T>> GetMinimalSpanningTreeKurskal()
+        {
+            List<Edge<T>> mst = new List<Edge<T>>();
+            if (Count == 0)
+                return null;
+            //To be implemented
+            return mst;
         }
         public override void PrintGraph()
         {
