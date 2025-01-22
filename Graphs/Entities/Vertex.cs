@@ -3,7 +3,7 @@ namespace DSA.Graphs.Entities
 {
     public class Vertex<T> where T : IEquatable<T>
     {
-        public T Value { get; set; }
+        public T Value { get;private set; }
         public Vertex()
         {
             Value = default;

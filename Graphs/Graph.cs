@@ -29,11 +29,15 @@ namespace DSA.Graphs
         public Graph(T value): this(new Vertex<T>(value)) { }
         public void AddVertex(Vertex<T> vertex)
         {
+            if (vertex == null||VerticesSet.Contains(vertex))
+                return;
             VerticesSet.Add(vertex);
             Count++;
         }
         public void AddValue(T value)
         {
+            if (value == null)
+                return;
             Vertex<T> v = new Vertex<T>(value);
             AddVertex(v);
         }
@@ -57,12 +61,18 @@ namespace DSA.Graphs
         }
         private void RemoveEdgesForRemovedVertex(Vertex<T> vertex)
         {
+            if (vertex == null)
+                return;
             Edges.RemoveWhere(e=>e.From.IsIdenticalTo(vertex));
-            Edges.RemoveWhere(e => e.To.IsIdenticalTo(vertex));
+            Edges.RemoveWhere(e=>e.To.IsIdenticalTo(vertex));
         }
         public void RemoveValue(T value)
         {
+            if (value == null)
+                return;
             List<Vertex<T>> verticsToRemove = GetAllVerticsByValue(value);
+            if (verticsToRemove == null || verticsToRemove.Count ==0)
+                return;
             for (int i = 0;i < verticsToRemove.Count;i++)
             {
                 RemoveVertex(verticsToRemove[i]);
@@ -71,7 +81,7 @@ namespace DSA.Graphs
         public List<Vertex<T>> GetAllNeighbors(Vertex<T> vertex)
         {
             List<Vertex<T>> list= new List<Vertex<T>>();
-            if (vertex == null)
+            if (vertex == null||Count==0)
                 return list;
             foreach(var edge in Edges)
             {
@@ -103,7 +113,7 @@ namespace DSA.Graphs
                 return false;
             if (Count == 0)
                 return false;
-            return GetFirstVerticsByValue(value)!=null;
+            return VerticesSet.FirstOrDefault(v=>v.Value.Equals(value))!=null;
         }
         public List<Vertex<T>> GetAllVerticsList()
         {
@@ -132,7 +142,7 @@ namespace DSA.Graphs
                         List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
                         foreach (Edge<T> edge in edges)
                         {
-                            if (edge.To != null && !visited.Contains(edge.To))
+                            if (!visited.Contains(edge.To))
                                 stack.Push(edge.To);
                         }
                     }
@@ -163,7 +173,7 @@ namespace DSA.Graphs
                         List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
                         foreach (Edge<T> edge in edges)
                         {
-                            if (edge.To != null && !visited.Contains(edge.To))
+                            if (!visited.Contains(edge.To))
                                 queue.Enqueue(edge.To);
                         }
                     }
@@ -171,13 +181,16 @@ namespace DSA.Graphs
             }
             return list;
         }
+        /// <summary>
+        /// Return true if all ther vertics of graph is connected.
+        /// </summary>
+        /// <returns></returns>
         public bool CheckConnectivity()
         {
             if(Count==0)
                 return false;
             List<Vertex<T>> a = GetVerticesDFSFromGenesis();
-            HashSet<Vertex<T>> b =VerticesSet;
-            return a.Count == b.Count;
+            return a.Count == Count;
         }
         public List<Vertex<T>> GetVerticesDFSFromGenesis()
         {
@@ -197,7 +210,7 @@ namespace DSA.Graphs
                     List<Edge<T>> edges = Edges.Where(e => e.From.IsIdenticalTo(vertex)).ToList();
                     foreach (Edge<T> edge in edges)
                     {
-                        if (edge.To != null && !visited.Contains(edge.To))
+                        if (!visited.Contains(edge.To))
                             stack.Push(edge.To);
                     }
                 }
@@ -208,27 +221,39 @@ namespace DSA.Graphs
         {
             if (from == null || to == null)
                 return;
+            if (Edges.FirstOrDefault(e => e.From.IsIdenticalTo(from) && e.To.IsIdenticalTo(to)) != null)
+                return;
+            if (Edges.FirstOrDefault(e => e.From.IsIdenticalTo(to) && e.To.IsIdenticalTo(from)) != null)
+                return;
+            if (!VerticesSet.Contains(from))
+                AddVertex(from);
+            if (!VerticesSet.Contains(to))
+                AddVertex(to);
             Edges.Add(new Edge<T>(from, to));
             Edges.Add(new Edge<T>(to, from));
         }
         public virtual void RemoveEdge(Vertex<T> from, Vertex<T> to)
         {
+            if (from == null || to == null)
+                return;
             Edges.RemoveWhere(edge=>edge.From.IsIdenticalTo(from) &&edge.To.IsIdenticalTo(to));
-            Edges.RemoveWhere(edge => edge.From.IsIdenticalTo(to) && edge.To.IsIdenticalTo(from));
+            Edges.RemoveWhere(edge=>edge.From.IsIdenticalTo(to) && edge.To.IsIdenticalTo(from));
         }
         public Vertex<T> GetFirstVerticsByValue(T value)
         {
+            if (value == null)
+                return null;
             return VerticesSet.FirstOrDefault(v=>v.Value.Equals(value));
         }
         public List<Vertex<T>> GetAllVerticsByValue(T value)
         {
-            if (Count == 0)
+            if (Count == 0||value==null)
                 return null;
             return VerticesSet.Where(v=>v.Value.Equals(value)).ToList();
         }
         public Vertex<T> GetVertex(Vertex<T> vertex)
         {
-            if (Count == 0)
+            if (Count == 0||vertex==null)
                 return null;
             foreach(Vertex<T> v in VerticesSet)
             {
@@ -237,11 +262,18 @@ namespace DSA.Graphs
             }
             return null;
         }
-        public int GetDegreeOfVertex(Vertex<T> vertex)
+        public int GetOutDegreeOfVertex(Vertex<T> vertex)
         {
             if (vertex == null || Count == 0)
                 return -1;
-            List<Edge<T>> edges=Edges.Where(v=>v.To!=null&&v.From.IsIdenticalTo(vertex)).ToList();
+            List<Edge<T>> edges=Edges.Where(v=>v.From.IsIdenticalTo(vertex)).ToList();
+            return edges.Count;
+        }
+        public int GetInDegreeOfVertex(Vertex<T> vertex)
+        {
+            if (vertex == null || Count == 0)
+                return -1;
+            List<Edge<T>> edges = Edges.Where(v => v.To.IsIdenticalTo(vertex)).ToList();
             return edges.Count;
         }
         public List<Vertex<T>> GetAllVerticesByDFS()
@@ -267,7 +299,7 @@ namespace DSA.Graphs
                         List<Edge<T>> edges = Edges.Where(e => e.From.IsIdenticalTo(vertex)).ToList();
                         foreach (Edge<T> edge in edges)
                         {
-                            if (edge.To != null && !visited.Contains(edge.To))
+                            if (!visited.Contains(edge.To))
                                 stack.Push(edge.To);
                         }
                     }
@@ -298,7 +330,7 @@ namespace DSA.Graphs
                         List<Edge<T>> edges = Edges.Where(v => v.From.IsIdenticalTo(vertex)).ToList();
                         foreach (Edge<T> edge in edges)
                         {
-                            if (edge.To != null && !visited.Contains(edge.To))
+                            if (!visited.Contains(edge.To))
                                 queue.Enqueue(edge.To);
                         }
                     }
@@ -327,10 +359,6 @@ namespace DSA.Graphs
                     Console.WriteLine(edge.From.Value + "\t" + "Null");
             }
             Console.WriteLine("----------------------");
-        }
-        protected void AddCountByOne()
-        {
-            Count++;
         }
     }
 }

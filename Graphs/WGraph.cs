@@ -19,25 +19,35 @@ namespace DSA.Graphs
         {
             if (from == null || to == null)
                 return;
-            Edges.Add(new Edge<T>(to, from,weight));
+            if (Edges.FirstOrDefault(e => e.From.IsIdenticalTo(from) && e.To.IsIdenticalTo(to)) != null)
+                return;
+            if (Edges.FirstOrDefault(e => e.From.IsIdenticalTo(to) && e.To.IsIdenticalTo(from)) != null)
+                return;
+            if (!VerticesSet.Contains(from))
+                AddVertex(from);
+            if (!VerticesSet.Contains(to))
+                AddVertex(to);
+            Edges.Add(new Edge<T>(from, to,weight));
+            Edges.Add(new Edge<T>(to, from, weight));
         }
         public virtual void ChangeWeight(Vertex<T> from, Vertex<T> to, int weight)
         {
             if (from == null || to == null)
                 return;
             Edges.RemoveWhere(e=>e.From.IsIdenticalTo(from)&&e.To.IsIdenticalTo(to));
+            Edges.RemoveWhere(e=>e.From.IsIdenticalTo(to)&&e.To.IsIdenticalTo(from));
             Edges.Add(new Edge<T>(from, to, weight));
             Edges.Add(new Edge<T>(to, from, weight));
         }
-        public override void LinkVertexToGenesisVertex(Vertex<T> node)
+        public override void LinkVertexToGenesisVertex(Vertex<T> vertex)
         {
-            LinkVertexToGenesisVertex(node, 1);
+            LinkVertexToGenesisVertex(vertex, 1);
         }
-        public virtual void LinkVertexToGenesisVertex(Vertex<T> node,int weight)
+        public virtual void LinkVertexToGenesisVertex(Vertex<T> vertex, int weight)
         {
-            if (node == null || GenesisVertex == null)
+            if (vertex == null || GenesisVertex == null)
                 return;
-            AddEdge(node, GenesisVertex, weight);
+            AddEdge(vertex, GenesisVertex, weight);
         }
         public List<Edge<T>> GetMinimalSpanningTreePrim()
         {
@@ -51,7 +61,7 @@ namespace DSA.Graphs
                 List<Edge<T>> edges=new List<Edge<T>>();
                 foreach (var vertex in connectedVertics)
                 {
-                    List<Edge<T>> list = Edges.Where(e => e.From.IsIdenticalTo(vertex) && e.To != null&&!connectedVertics.Contains(e.To)).ToList();
+                    List<Edge<T>> list = Edges.Where(e => e.From.IsIdenticalTo(vertex)&&!connectedVertics.Contains(e.To)).ToList();
                     edges.AddRange(list);
                 }
                 if (edges != null || edges.Count != 0)
@@ -103,11 +113,10 @@ namespace DSA.Graphs
             List<Edge<T>> mst = new List<Edge<T>>();
             if (Count == 0)
                 return null;
-            List<Vertex<T>> vertices=GetAllVerticsList();
             Dictionary<Vertex<T>, HashSet<Vertex<T>>> comps=new Dictionary<Vertex<T>, HashSet<Vertex<T>>>();
-            foreach (var vertex in vertices) 
+            foreach (var vertex in VerticesSet) 
             {
-                comps[vertex] = new HashSet<Vertex<T>> { vertex};
+                comps[vertex] = new HashSet<Vertex<T>> {vertex};
             }
             PriorityQueue<Edge<T>,int> priorityQueue=new PriorityQueue<Edge<T>,int>();
             foreach(var edge in Edges)
@@ -139,6 +148,13 @@ namespace DSA.Graphs
             if (Count == 0)
                 return shortestPath;
             List<Vertex<T>> vertices=GetAllVerticsList();
+            throw new NotImplementedException();
+        }
+        public List<Edge<T>> GetShortestPathFord(Vertex<T> from, Vertex<T> to)
+        {
+            List<Edge<T>> shortestPath = new List<Edge<T>>();
+            if (Count == 0)
+                return shortestPath;
             throw new NotImplementedException();
         }
         public override void PrintGraph()
