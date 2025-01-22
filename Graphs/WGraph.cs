@@ -69,12 +69,72 @@ namespace DSA.Graphs
             }
             return mst;
         }
+        public List<Edge<T>> GetMinimalSpanningTreePrimOptimized()
+        {
+            List<Edge<T>> mst = new List<Edge<T>>();
+            if (Count == 0 || !CheckConnectivity())
+                return mst;
+            HashSet<Vertex<T>> connectedVertics = new HashSet<Vertex<T>>();
+            connectedVertics.Add(GenesisVertex);
+            PriorityQueue<Edge<T>,int> priorityQueue=new PriorityQueue<Edge<T>,int>();
+            foreach(var edge in Edges.Where(e=>e.From.IsIdenticalTo(GenesisVertex)))
+            {
+                priorityQueue.Enqueue(edge,edge.Weight);
+            }
+            while (connectedVertics.Count != Count)
+            {
+                while (priorityQueue.Count > 0) 
+                {
+                    Edge<T>  shortestPath=priorityQueue.Dequeue();
+                    if(!connectedVertics.Contains(shortestPath.To))
+                    {
+                        mst.Add(shortestPath);
+                        connectedVertics.Add(shortestPath.To);
+                        foreach(var edge in Edges.Where(e => e.From.IsIdenticalTo(shortestPath.To)))
+                        {
+                            priorityQueue.Enqueue(edge, edge.Weight);
+                        }
+                        break;
+                    }
+                }
+                if (priorityQueue.Count == 0 && connectedVertics.Count < Count)
+                    return null;
+            }
+            return mst;
+        }
         public List<Edge<T>> GetMinimalSpanningTreeKurskal()
         {
             List<Edge<T>> mst = new List<Edge<T>>();
             if (Count == 0)
                 return null;
-            //To be implemented
+            List<Vertex<T>> vertices=GetAllVertics();
+            Dictionary<Vertex<T>, HashSet<Vertex<T>>> comps=new Dictionary<Vertex<T>, HashSet<Vertex<T>>>();
+            foreach (var vertex in vertices) 
+            {
+                comps[vertex] = new HashSet<Vertex<T>> { vertex};
+            }
+            PriorityQueue<Edge<T>,int> priorityQueue=new PriorityQueue<Edge<T>,int>();
+            foreach(var edge in Edges)
+            {
+                priorityQueue.Enqueue(edge,edge.Weight);
+            }
+            while(mst.Count<Count-1&&priorityQueue.Count>0)
+            {
+                Edge<T> shortestPath=priorityQueue.Dequeue();
+                var from = comps[shortestPath.From];
+                var to = comps[shortestPath.To];
+                if(from!=to)
+                {
+                    mst.Add(shortestPath);
+                    from.UnionWith(to);
+                    foreach (var vertex in to)
+                    {
+                        comps[vertex] = from;
+                    }
+                }
+            }
+            if (mst.Count != Count - 1)
+                return null;
             return mst;
         }
         public override void PrintGraph()
