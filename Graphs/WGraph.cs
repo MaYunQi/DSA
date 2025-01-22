@@ -11,33 +11,29 @@ namespace DSA.Graphs
         public WGraph() : base() { }
         public WGraph(T value) : base(value) { }
         public WGraph(Vertex<T> vertex) : base(vertex) { }
-        public void AddEdge(Vertex<T> from, Vertex<T> to, int weight)
+        public override void AddEdge(Vertex<T> from, Vertex<T> to)
         {
-            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from));
-            if (edge == null)
-                AddCountByOne();
-            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to));
-            if (edge == null)
-                AddCountByOne();
-            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from) && v.To == null);
-            if (edge != null)
-                Edges.Remove(edge);
-            Edges.Add(new Edge<T>(from, to,weight));
-            edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to) && v.To == null);
-            if (edge != null)
-                Edges.Remove(edge);
+            AddEdge(from, to, 1);
+        }
+        public virtual void AddEdge(Vertex<T> from, Vertex<T> to, int weight)
+        {
+            if (from == null || to == null)
+                return;
             Edges.Add(new Edge<T>(to, from,weight));
         }
-        public void ChangeWeight(Vertex<T> from, Vertex<T> to, int weight)
+        public virtual void ChangeWeight(Vertex<T> from, Vertex<T> to, int weight)
         {
-            Edge<T> edge = Edges.FirstOrDefault(v => v.From.IsIdenticalTo(from)&&v.To.IsIdenticalTo(to));
-            Edges.Remove(edge);
-            edge= Edges.FirstOrDefault(v => v.From.IsIdenticalTo(to) && v.To.IsIdenticalTo(from));
-            Edges.Remove(edge);
+            if (from == null || to == null)
+                return;
+            Edges.RemoveWhere(e=>e.From.IsIdenticalTo(from)&&e.To.IsIdenticalTo(to));
             Edges.Add(new Edge<T>(from, to, weight));
             Edges.Add(new Edge<T>(to, from, weight));
         }
-        public void LinkVertexToGenesisVertex(Vertex<T> node,int weight)
+        public override void LinkVertexToGenesisVertex(Vertex<T> node)
+        {
+            LinkVertexToGenesisVertex(node, 1);
+        }
+        public virtual void LinkVertexToGenesisVertex(Vertex<T> node,int weight)
         {
             if (node == null || GenesisVertex == null)
                 return;
@@ -107,7 +103,7 @@ namespace DSA.Graphs
             List<Edge<T>> mst = new List<Edge<T>>();
             if (Count == 0)
                 return null;
-            List<Vertex<T>> vertices=GetAllVertics();
+            List<Vertex<T>> vertices=GetAllVerticsList();
             Dictionary<Vertex<T>, HashSet<Vertex<T>>> comps=new Dictionary<Vertex<T>, HashSet<Vertex<T>>>();
             foreach (var vertex in vertices) 
             {
@@ -136,6 +132,14 @@ namespace DSA.Graphs
             if (mst.Count != Count - 1)
                 return null;
             return mst;
+        }
+        public List<Edge<T>> GetShortestPathDijkstra(Vertex<T> from, Vertex<T> to)
+        {
+            List<Edge<T>> shortestPath = new List<Edge<T>>();
+            if (Count == 0)
+                return shortestPath;
+            List<Vertex<T>> vertices=GetAllVerticsList();
+            throw new NotImplementedException();
         }
         public override void PrintGraph()
         {
