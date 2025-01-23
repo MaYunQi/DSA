@@ -8,6 +8,7 @@ namespace DSA
     {
         static void Main(string[] args)
         {
+            #region Graph 
             WGraph<char> graph = new WGraph<char>('a');
             Vertex<char> b= new Vertex<char>('b');
             Vertex<char> c = new Vertex<char>('c');
@@ -36,7 +37,9 @@ namespace DSA
             {
                 Console.WriteLine(edge.From.Value+"\t"+edge.To.Value+"\t"+edge.Weight);
             }
+            #endregion
 
+            #region N-Queens
             NQueens nQueens = new NQueens();
             List<List<string>> result=nQueens.SolveNQueens(8);
             foreach(List<string> list in result)
@@ -52,6 +55,24 @@ namespace DSA
                 }
                 Console.WriteLine("---------------");
             }
+            #endregion
+
+            #region Sudoku
+            char[,] board=new char[9,9];
+            for (int i = 0;i < 9;i++)
+            {
+                for (int j = 0; j < 9; j++)
+                    board[i, j] = '.';
+            }
+            Sudoku sudoku = new Sudoku();
+            board=sudoku.SudokuSolver(board);
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                    Console.Write(board[i,j]+" ");
+                Console.WriteLine();
+            }
+            #endregion
         }
     }
 }
