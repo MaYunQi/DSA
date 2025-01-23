@@ -1,4 +1,5 @@
-﻿using DSA.Graphs;
+﻿using DSA.Algorithms.Backtracking;
+using DSA.Graphs;
 using DSA.Graphs.Entities;
 
 namespace DSA
@@ -34,6 +35,22 @@ namespace DSA
             foreach(Edge<char> edge in mst)
             {
                 Console.WriteLine(edge.From.Value+"\t"+edge.To.Value+"\t"+edge.Weight);
+            }
+
+            NQueens nQueens = new NQueens();
+            List<List<string>> result=nQueens.SolveNQueens(8);
+            foreach(List<string> list in result)
+            {
+                Console.WriteLine("---------------");
+                foreach (string s in list)
+                {
+                    for (int i = 0; i < s.Length; i++)
+                    {
+                        Console.Write(s[i]+" ");
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine("---------------");
             }
         }
     }
